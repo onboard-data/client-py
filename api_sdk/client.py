@@ -35,3 +35,11 @@ class APIClient:
             for e in equipment:
                 point_ids += map(lambda p: p['id'], e['points'])
         return point_ids
+
+    def get_points_by_ids(self, point_ids):
+        token = self._get_token()
+        points_str = '[' + ','.join(str(id) for id in point_ids) + ']'
+        url = '{}/points?point_ids={}'.format(self._api_url, points_str)
+        headers = {'Authorization': 'Bearer {}'.format(token)}
+        points = requests.get(url, headers=headers).json()
+        return points
