@@ -43,3 +43,24 @@ class APIClient:
         headers = {'Authorization': 'Bearer {}'.format(token)}
         points = requests.get(url, headers=headers).json()
         return points
+
+    def get_all_point_types(self):
+        token = self._get_token()
+        url = '{}/pointtypes'.format(self._api_url)
+        headers = {'Authorization': 'Bearer {}'.format(token)}
+        point_types = requests.get(url, headers=headers).json()
+        return point_types
+
+    def get_all_measurements(self):
+        token = self._get_token()
+        url = '{}/measurements'.format(self._api_url)
+        headers = {'Authorization': 'Bearer {}'.format(token)}
+        measurements = requests.get(url, headers=headers).json()
+        return measurements
+
+    def get_all_units(self):
+        token = self._get_token()
+        url = '{}/unit'.format(self._api_url)
+        headers = {'Authorization': 'Bearer {}'.format(token)}
+        units = requests.get(url, headers=headers).json()
+        return units
