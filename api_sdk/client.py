@@ -22,7 +22,7 @@ class APIClient:
             self._token = response.json()['userInfo']['token']
         return self._token
 
-    def get_all_point_ids(self):
+    def get_all_points(self):
         token = self._get_token()
         buildings_url = '{}/buildings'.format(self._api_url)
         headers = {'Authorization': 'Bearer {}'.format(token)}
@@ -33,7 +33,7 @@ class APIClient:
             points_url = '{}/buildings/{}/equipment?points=true'.format(self._api_url, bldg_id)
             equipment = requests.get(points_url, headers=headers).json()
             for e in equipment:
-                point_ids += map(lambda p: p['id'], e['points'])
+                point_ids += e['points']
         return point_ids
 
     def get_points_by_ids(self, point_ids):
