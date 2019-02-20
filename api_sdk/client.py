@@ -36,12 +36,21 @@ class APIClient:
                 point_ids += e['points']
         return point_ids
 
+    def divide_chunks(self, l, n):
+        # looping till length l
+        for i in range(0, len(l), n):
+            yield l[i:i + n]
+
     def get_points_by_ids(self, point_ids):
         token = self._get_token()
-        points_str = '[' + ','.join(str(id) for id in point_ids) + ']'
-        url = '{}/points?point_ids={}'.format(self._api_url, points_str)
-        headers = {'Authorization': 'Bearer {}'.format(token)}
-        points = requests.get(url, headers=headers).json()
+        point_ids_chunked = list(self.divide_chunks(point_ids, 500))
+        points = []
+        for chunk in point_ids_chunked:
+            points_str = '[' + ','.join(str(id) for id in chunk) + ']'
+            url = '{}/points?point_ids={}'.format(self._api_url, points_str)
+            headers = {'Authorization': 'Bearer {}'.format(token)}
+            points_chunk = requests.get(url, headers=headers).json()
+            points += points_chunk
         return points
 
     def get_all_point_types(self):
