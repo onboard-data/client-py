@@ -1,5 +1,6 @@
 import requests
 import json
+import urllib.parse
 
 
 class APIClient:
@@ -48,6 +49,19 @@ class APIClient:
         for chunk in point_ids_chunked:
             points_str = '[' + ','.join(str(id) for id in chunk) + ']'
             url = '{}/points?point_ids={}'.format(self._api_url, points_str)
+            headers = {'Authorization': 'Bearer {}'.format(token)}
+            points_chunk = requests.get(url, headers=headers).json()
+            points += points_chunk
+        return points
+
+    def get_points_by_datasource(self, datasource_hashes):
+        token = self._get_token()
+        datasource_hashes_chunked = list(self.divide_chunks(datasource_hashes, 500))
+        points = []
+        for chunk in datasource_hashes_chunked:
+            hashes_str = "[" + ','.join([r"'" + c + r"'" for c in chunk]) + "]"
+            query = urllib.parse.quote(hashes_str)
+            url = '{}/points?datasource_hashes={}'.format(self._api_url, query)
             headers = {'Authorization': 'Bearer {}'.format(token)}
             points_chunk = requests.get(url, headers=headers).json()
             points += points_chunk
