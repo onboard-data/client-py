@@ -56,7 +56,7 @@ class APIClient:
 
     def get_points_by_datasource(self, datasource_hashes):
         token = self._get_token()
-        datasource_hashes_chunked = list(self.divide_chunks(datasource_hashes, 500))
+        datasource_hashes_chunked = list(self.divide_chunks(datasource_hashes, 125))
         points = []
         for chunk in datasource_hashes_chunked:
             hashes_str = "[" + ','.join([r"'" + c + r"'" for c in chunk]) + "]"
