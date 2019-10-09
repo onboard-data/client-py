@@ -81,3 +81,11 @@ class APIClient:
         url = '{}/unit'.format(self._api_url)
         units = requests.get(url, headers=self.auth()).json()
         return units
+
+    def update_point_data(self, updates=[]):
+        """Bulk update point data, returns the number of updated points
+        updates: an iterable of models.PointDataUpdate objects"""
+        url = '{}/points_update'.format(self._api_url)
+        json = [u.json() for u in updates]
+        patched = requests.post(url, json=json, headers=self.auth()).json()
+        return patched
