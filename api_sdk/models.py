@@ -1,3 +1,4 @@
+import math
 from datetime import datetime
 
 
@@ -21,3 +22,29 @@ class PointDataUpdate(object):
         return {'id': self.point_id,
                 'value': self.value,
                 'last_updated': self.last_updated.timestamp() * 1000}
+
+
+class IngestStats(object):
+    def __init__(self):
+        self._points = []
+        self._building = {}
+
+    def summary(self, info):
+        # infos, errors, num_points, sample_points, etc
+        for k, v in info.items():
+            if k == 'elapsed':
+                self.elapsed(v)
+            else:
+                self._building[k] = v
+
+    def add_points(self, points):
+        self._points += points
+
+    def elapsed(self, elapsed):
+        self.building['processing_time_ms'] = math.floor(elapsed.microseconds / 100)
+
+    def json(self):
+        return {
+            'building': self._building,
+            'points': self._points,
+        }

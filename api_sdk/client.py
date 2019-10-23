@@ -107,6 +107,16 @@ class APIClient:
         patched = requests.post(url, json=json, headers=self.auth()).json()
         return patched
 
+    def send_ingest_stats(self, ingest_stats):
+        """Send timing and diagnostic info to the portal
+        ingest_stats: an instance of models.IngestStats"""
+        url = '{}/ingest-stats'.format(self._api_url)
+        json = ingest_stats.json()
+        res = requests.post(url, json=json, headers=self.auth())
+        if res.status_code > 399:
+            raise Exception(f"Exception sending stats: code {res.status_code}")
+        return res.json()
+
 
 class DevelopmentAPIClient(APIClient):
     def __init__(self, user=None, pw=None, api_key=None):
