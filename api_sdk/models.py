@@ -41,7 +41,7 @@ class IngestStats(object):
         self._points += points
 
     def elapsed(self, elapsed):
-        self.building['processing_time_ms'] = math.floor(elapsed.microseconds / 100)
+        self._building['processing_time_ms'] = math.floor(elapsed.microseconds / 100)
 
     def json(self):
         return {
