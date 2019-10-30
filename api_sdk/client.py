@@ -20,7 +20,8 @@ class APIClient:
             'login': self._user,
             'password': self._pw,
         }
-        headers = {'Content-Type': 'application/json'}
+        headers = {'Content-Type': 'application/json',
+                   'User-Agent': 'Onboard Py-SDK', }
         response = requests.post(url, json=payload, headers=headers)
         self._token = response.json()['userInfo']['token']
 
@@ -42,18 +43,25 @@ class APIClient:
         token = self._get_token()
         return {
             'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json'}
+            'Content-Type': 'application/json',
+            'User-Agent': 'Onboard Py-SDK', }
+
+    def get_all_buildings(self):
+        url = f"{self._api_url}/buildings"
+        return requests.get(url, headers=self.auth()).json()
+
+    def get_building_equipment(self, building_id):
+        points_url = '{}/buildings/{}/equipment?points=true' \
+            .format(self._api_url, building_id)
+        equipment = requests.get(points_url, headers=self.auth()).json()
+        return equipment
 
     def get_all_points(self):
-        headers = self.auth()
-        buildings_url = '{}/buildings'.format(self._api_url)
-        buildings = requests.get(buildings_url, headers=headers).json()
+        buildings = self.get_all_buildings()
         bldg_ids = list(map(lambda b: b['id'], buildings))
         point_ids = []
         for bldg_id in bldg_ids:
-            points_url = '{}/buildings/{}/equipment?points=true' \
-                .format(self._api_url, bldg_id)
-            equipment = requests.get(points_url, headers=headers).json()
+            equipment = self.get_building_equipment(bldg_id)
             for e in equipment:
                 point_ids += e['points']
         return point_ids
@@ -93,6 +101,18 @@ class APIClient:
         url = '{}/unit'.format(self._api_url)
         units = requests.get(url, headers=self.auth()).json()
         return units
+
+    def query_point_timeseries(self, point_ids, start_time, end_time):
+        url = '{}/query'.format(self._api_url)
+        query = {
+            'point_ids': point_ids,
+            'start_time': f"'{start_time}'",
+            'end_time': f"'{end_time}'",
+        }
+        res = requests.post(url, json=query, headers=self.auth())
+        if res.status_code > 399:
+            raise Exception(f"timeseries query failed: {res.text}")
+        return res.json()
 
     def update_point_data(self, updates=[]):
         """Bulk update point data, returns the number of updated points
