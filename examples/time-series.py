@@ -1,6 +1,7 @@
 import os
 import sys
 from api_sdk.client import ProductionAPIClient
+from api_sdk.util import points_df_from_timeseries
 
 
 def usage():
@@ -48,9 +49,7 @@ def fetch_time_series(api_key, building, equip_suffix, start_time, end_time):
     point_ids = [p['id'] for p in equipment['points']]
     timeseries = client.query_point_timeseries(point_ids, start_time, end_time)
 
-    import json
-    print(json.dumps(timeseries))
-    # TODO: turn this into a dataframe for Brian
+    return points_df_from_timeseries(timeseries, equipment['points'])
 
 
 if __name__ == '__main__':
@@ -74,4 +73,7 @@ if __name__ == '__main__':
     else:
         equip_suffix = split[1]
 
-    fetch_time_series(api_key, building, equip_suffix, start, end)
+    df = fetch_time_series(api_key, building, equip_suffix, start, end)
+
+    print(df.head(5))
+    print(len(df))
