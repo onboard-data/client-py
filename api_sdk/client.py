@@ -1,11 +1,6 @@
 import requests
 import urllib.parse
-
-
-def divide_chunks(l, n):
-    # looping till length l
-    for i in range(0, len(l), n):
-        yield l[i:i + n]
+from .util import divide_chunks
 
 
 class APIClient:
