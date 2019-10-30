@@ -29,7 +29,8 @@ class APIClient:
         url = '{}/login/api-key'.format(self._api_url)
         payload = {'key': self._api_key}
         response = requests.post(url, json=payload)
-        self._token = response.json()['userInfo']['token']
+        if response.status_code == 200:
+            self._token = response.json()['userInfo']['token']
 
     def _get_token(self):
         if self._token is None:
@@ -37,6 +38,8 @@ class APIClient:
                 self._api_key_login()
             else:
                 self._pw_login()
+        if self._token is None:
+            raise Exception("Not authorized")
         return self._token
 
     def auth(self):
@@ -106,8 +109,8 @@ class APIClient:
         url = '{}/query'.format(self._api_url)
         query = {
             'point_ids': point_ids,
-            'start_time': f"'{start_time}'",
-            'end_time': f"'{end_time}'",
+            'start_time': start_time,
+            'end_time': end_time,
         }
         res = requests.post(url, json=query, headers=self.auth())
         if res.status_code > 399:
