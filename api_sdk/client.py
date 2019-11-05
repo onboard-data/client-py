@@ -1,6 +1,13 @@
 import requests
 import urllib.parse
-from .util import divide_chunks
+from .util import divide_chunks, json
+from . import OnboardApiException
+
+
+HEADERS = {
+    'Content-Type': 'application/json',
+    'User-Agent': 'Onboard Py-SDK',
+}
 
 
 class APIClient:
@@ -12,52 +19,50 @@ class APIClient:
         self._api_key = api_key
         self._token = None
         if not (api_key or (user and pw)):
-            raise TypeError("Need one of: user & pw or an api key")
+            raise OnboardApiException("Need one of: user & pw or an api key")
 
+    @json
     def _pw_login(self):
         url = '{}/login'.format(self._api_url)
         payload = {
             'login': self._user,
             'password': self._pw,
         }
-        headers = {'Content-Type': 'application/json',
-                   'User-Agent': 'Onboard Py-SDK', }
-        response = requests.post(url, json=payload, headers=headers)
-        self._token = response.json()['userInfo']['token']
+        return requests.post(url, json=payload, headers=HEADERS)
 
+    @json
     def _api_key_login(self):
         url = '{}/login/api-key'.format(self._api_url)
         payload = {'key': self._api_key}
-        response = requests.post(url, json=payload)
-        if response.status_code == 200:
-            self._token = response.json()['userInfo']['token']
+        return requests.post(url, json=payload, headers=HEADERS)
 
     def _get_token(self):
         if self._token is None:
             if self._api_key:
-                self._api_key_login()
+                login_res = self._api_key_login()
             else:
-                self._pw_login()
+                login_res = self._pw_login()
+            self._token = login_res['userInfo']['token']
+
         if self._token is None:
-            raise Exception("Not authorized")
+            raise OnboardApiException("Not authorized")
+
         return self._token
 
     def auth(self):
         token = self._get_token()
-        return {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json',
-            'User-Agent': 'Onboard Py-SDK', }
+        return {'Authorization': f'Bearer {token}', **HEADERS}
 
+    @json
     def get_all_buildings(self):
         url = f"{self._api_url}/buildings"
-        return requests.get(url, headers=self.auth()).json()
+        return requests.get(url, headers=self.auth())
 
+    @json
     def get_building_equipment(self, building_id):
         points_url = '{}/buildings/{}/equipment?points=true' \
             .format(self._api_url, building_id)
-        equipment = requests.get(points_url, headers=self.auth()).json()
-        return equipment
+        return requests.get(points_url, headers=self.auth())
 
     def get_all_points(self):
         buildings = self.get_all_buildings()
@@ -70,70 +75,78 @@ class APIClient:
         return point_ids
 
     def get_points_by_ids(self, point_ids):
+        @json
+        def get_points(url):
+            return requests.get(url, headers=self.auth())
+
         point_ids_chunked = list(divide_chunks(point_ids, 500))
         points = []
         for chunk in point_ids_chunked:
             points_str = '[' + ','.join(str(id) for id in chunk) + ']'
             url = '{}/points?point_ids={}'.format(self._api_url, points_str)
-            points_chunk = requests.get(url, headers=self.auth()).json()
+            points_chunk = get_points(url)
             points += points_chunk
         return points
 
     def get_points_by_datasource(self, datasource_hashes):
         datasource_hashes_chunked = list(divide_chunks(datasource_hashes, 125))
+        @json
+        def get_points(url):
+            return requests.get(url, headers=self.auth())
+
         points = []
         for chunk in datasource_hashes_chunked:
             hashes_str = "[" + ','.join([r"'" + c + r"'" for c in chunk]) + "]"
             query = urllib.parse.quote(hashes_str)
             url = '{}/points?datasource_hashes={}'.format(self._api_url, query)
-            points_chunk = requests.get(url, headers=self.auth()).json()
+            points_chunk = get_points(url)
             points += points_chunk
         return points
 
+    @json
     def get_all_point_types(self):
         url = '{}/pointtypes'.format(self._api_url)
-        point_types = requests.get(url, headers=self.auth()).json()
-        return point_types
+        return requests.get(url, headers=self.auth())
 
+    @json
     def get_all_measurements(self):
         url = '{}/measurements'.format(self._api_url)
-        measurements = requests.get(url, headers=self.auth()).json()
-        return measurements
+        return requests.get(url, headers=self.auth())
 
+    @json
     def get_all_units(self):
         url = '{}/unit'.format(self._api_url)
-        units = requests.get(url, headers=self.auth()).json()
-        return units
+        return requests.get(url, headers=self.auth())
 
+    @json
     def query_point_timeseries(self, point_ids, start_time, end_time):
+        """Query a timespan for a set of point ids
+        point_ids: a list of point ids
+        start/end time: ISO formatted timestamp strings
+        """
         url = '{}/query'.format(self._api_url)
         query = {
             'point_ids': point_ids,
             'start_time': start_time,
             'end_time': end_time,
         }
-        res = requests.post(url, json=query, headers=self.auth())
-        if res.status_code > 399:
-            raise Exception(f"timeseries query failed: {res.text}")
-        return res.json()
+        return requests.post(url, json=query, headers=self.auth())
 
+    @json
     def update_point_data(self, updates=[]):
         """Bulk update point data, returns the number of updated points
         updates: an iterable of models.PointDataUpdate objects"""
         url = '{}/points_update'.format(self._api_url)
         json = [u.json() for u in updates]
-        patched = requests.post(url, json=json, headers=self.auth()).json()
-        return patched
+        return requests.post(url, json=json, headers=self.auth())
 
+    @json
     def send_ingest_stats(self, ingest_stats):
         """Send timing and diagnostic info to the portal
         ingest_stats: an instance of models.IngestStats"""
         url = '{}/ingest-stats'.format(self._api_url)
         json = ingest_stats.json()
-        res = requests.post(url, json=json, headers=self.auth())
-        if res.status_code > 399:
-            raise Exception(f"Exception sending stats: code {res.status_code}")
-        return res.json()
+        return requests.post(url, json=json, headers=self.auth())
 
 
 class DevelopmentAPIClient(APIClient):
