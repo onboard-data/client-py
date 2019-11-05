@@ -10,7 +10,8 @@ def divide_chunks(l, n):
 def points_df_from_timeseries(timeseries, points=[]):
     """Returns a pandas dataframe from the results of a timeseries query"""
 
-    point_names = {str(p['id']): p.get('name') for p in points}
+    # 'type' is from the point_type.display_name column
+    point_names = {str(p['id']): p.get('type') for p in points}
 
     columns = ['timestamp']
     dates = set()
