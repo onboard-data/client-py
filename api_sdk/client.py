@@ -122,7 +122,7 @@ class APIClient:
     def query_point_timeseries(self, point_ids, start_time, end_time):
         """Query a timespan for a set of point ids
         point_ids: a list of point ids
-        start/end time: ISO formatted timestamp strings
+        start/end time: ISO formatted timestamp strings e.g. '2019-11-29T20:16:25Z'
         """
         url = '{}/query'.format(self._api_url)
         query = {
