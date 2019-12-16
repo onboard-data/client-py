@@ -1,5 +1,5 @@
 import math
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class PointDataUpdate(object):
@@ -19,9 +19,10 @@ class PointDataUpdate(object):
             raise ValueError(f"Invalid PointDataUpdate: {', '.join(errors)}")
 
     def json(self):
+        utc_ts_s = self.last_updated.replace(tzinfo=timezone.utc).timestamp()
         return {'id': self.point_id,
                 'value': self.value,
-                'last_updated': self.last_updated.timestamp() * 1000}
+                'last_updated': utc_ts_s * 1000}
 
 
 class IngestStats(object):
