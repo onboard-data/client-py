@@ -49,3 +49,20 @@ class IngestStats(object):
             'building': self._building,
             'points': self._points,
         }
+
+
+class PointSelector:
+    def __init__(self):
+        self.orgs = []
+        self.buildings = []
+        self.point_ids = []
+        self.point_names = []
+        self.point_hashes = []
+        self.point_types = []
+        self.equipment = []
+        self.updated_since = None
+
+    def json(self):
+        ts = self.updated_since.timestamp() * 1000.0 if self.updated_since is not None else None
+        dict = {k: getattr(self, k) for k in vars(self)}
+        return {**dict, 'updated_since': ts}

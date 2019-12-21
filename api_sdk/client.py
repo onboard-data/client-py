@@ -2,6 +2,7 @@ import requests
 import urllib.parse
 from .util import divide_chunks, json
 from . import OnboardApiException
+from .models import PointSelector
 
 
 HEADERS = {
@@ -63,6 +64,11 @@ class APIClient:
         points_url = '{}/buildings/{}/equipment?points=true' \
             .format(self._api_url, building_id)
         return requests.get(points_url, headers=self.auth())
+
+    @json
+    def select_points(self, selector: PointSelector):
+        url = f"{self._api_url}/points/select"
+        return requests.post(url, headers=self.auth(), json=selector.json())
 
     def get_all_points(self):
         buildings = self.get_all_buildings()
