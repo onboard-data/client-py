@@ -1,7 +1,7 @@
 import os
 import sys
 from api_sdk.client import ProductionAPIClient
-from api_sdk.util import points_df_from_timeseries
+from api_sdk.dataframes import points_df_from_timeseries
 
 
 def usage():
