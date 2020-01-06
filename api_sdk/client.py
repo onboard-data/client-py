@@ -13,17 +13,17 @@ HEADERS = {
 
 class APIClient:
 
-    def __init__(self, api_url, user=None, pw=None, api_key=None):
+    def __init__(self, api_url, user=None, pw=None, api_key=None, token=None):
         self._api_url = api_url
         self._user = user
         self._pw = pw
         self._api_key = api_key
-        self._token = None
-        if not (api_key or (user and pw)):
-            raise OnboardApiException("Need one of: user & pw or an api key")
+        self._token = token
+        if not (api_key or token or (user and pw)):
+            raise OnboardApiException("Need one of: user & pw, token or an api key")
 
     @json
-    def _pw_login(self):
+    def __pw_login(self):
         url = '{}/login'.format(self._api_url)
         payload = {
             'login': self._user,
@@ -32,7 +32,7 @@ class APIClient:
         return requests.post(url, json=payload, headers=HEADERS)
 
     @json
-    def _api_key_login(self):
+    def __api_key_login(self):
         url = '{}/login/api-key'.format(self._api_url)
         payload = {'key': self._api_key}
         return requests.post(url, json=payload, headers=HEADERS)
@@ -40,9 +40,9 @@ class APIClient:
     def _get_token(self):
         if self._token is None:
             if self._api_key:
-                login_res = self._api_key_login()
+                login_res = self.__api_key_login()
             else:
-                login_res = self._pw_login()
+                login_res = self.__pw_login()
             self._token = login_res['userInfo']['token']
 
         if self._token is None:
@@ -53,6 +53,11 @@ class APIClient:
     def auth(self):
         token = self._get_token()
         return {'Authorization': f'Bearer {token}', **HEADERS}
+
+    @json
+    def whoami(self):
+        url = f"{self._api_url}/whoami"
+        return requests.get(url, headers=self.auth())
 
     @json
     def get_all_buildings(self):
@@ -156,10 +161,10 @@ class APIClient:
 
 
 class DevelopmentAPIClient(APIClient):
-    def __init__(self, user=None, pw=None, api_key=None):
-        super().__init__('https://devapi.onboarddata.io', user, pw, api_key)
+    def __init__(self, user=None, pw=None, api_key=None, token=None):
+        super().__init__('https://devapi.onboarddata.io', user, pw, api_key, token)
 
 
 class ProductionAPIClient(APIClient):
-    def __init__(self, user=None, pw=None, api_key=None):
-        super().__init__('https://api.onboarddata.io', user, pw, api_key)
+    def __init__(self, user=None, pw=None, api_key=None, token=None):
+        super().__init__('https://api.onboarddata.io', user, pw, api_key, token)
