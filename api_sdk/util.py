@@ -1,4 +1,4 @@
-from . import OnboardApiException, OnboardTemporaryException
+from .exceptions import OnboardApiException, OnboardTemporaryException
 
 
 def divide_chunks(l, n):

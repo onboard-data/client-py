@@ -1,7 +1,7 @@
 import requests
 import urllib.parse
 from .util import divide_chunks, json
-from . import OnboardApiException
+from .exceptions import OnboardApiException
 from .models import PointSelector
 
 
