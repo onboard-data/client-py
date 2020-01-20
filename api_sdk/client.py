@@ -28,6 +28,9 @@ class APIClient:
             return self.__dict__ == other.__dict__
         return False
 
+    def __hash__(self) -> str:
+        return hash(str(self.__dict__))
+
     @json
     def __pw_login(self):
         url = '{}/login'.format(self._api_url)
