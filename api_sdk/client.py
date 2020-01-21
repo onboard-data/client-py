@@ -69,6 +69,11 @@ class APIClient:
         return requests.get(url, headers=self.auth())
 
     @json
+    def get_organizations(self):
+        url = f"{self._api_url}/organizations"
+        return requests.get(url, headers=self.auth())
+
+    @json
     def get_all_buildings(self):
         url = f"{self._api_url}/buildings"
         return requests.get(url, headers=self.auth())
