@@ -12,6 +12,13 @@ def json(func):
     def wrapper(*args, **kwargs):
         try:
             res = func(*args, **kwargs)
+
+            # remove the cached access token if authorization failed
+            # it's likely just expired
+            if res.status_code == 401 and args[0]._token is not None:
+                args[0]._token = None
+                return wrapper(*args, **kwargs)
+
             if res.status_code > 499:
                 raise OnboardTemporaryException(res.text)
             if res.status_code > 399:
