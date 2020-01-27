@@ -3,7 +3,6 @@ import urllib.parse
 from .util import divide_chunks, json
 from .exceptions import OnboardApiException
 from .models import PointSelector
-from typing import Any
 
 
 HEADERS = {
@@ -22,14 +21,6 @@ class APIClient:
         self._token = token
         if not (api_key or token or (user and pw)):
             raise OnboardApiException("Need one of: user & pw, token or an api key")
-
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, APIClient):
-            return self.__dict__ == other.__dict__
-        return False
-
-    def __hash__(self) -> str:
-        return hash(str(self.__dict__))
 
     @json
     def __pw_login(self):
