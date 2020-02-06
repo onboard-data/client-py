@@ -66,3 +66,20 @@ class PointSelector:
         ts = self.updated_since.timestamp() * 1000.0 if self.updated_since is not None else None
         dict = {k: getattr(self, k) for k in vars(self)}
         return {**dict, 'updated_since': ts}
+
+    def __eq__(self, other):
+        if not isinstance(other, PointSelector):
+            return False
+        return self.__dict__ == other.__dict__
+
+    @staticmethod
+    def from_json(dict):
+        ps = PointSelector()
+        for k in ps.__dict__.keys():
+            val = dict.get(k, [])
+            if k == 'updated_since':
+                val = dict.get(k)
+                if val is not None:
+                    val = datetime.fromtimestamp(val / 1000.0)
+            setattr(ps, k, val)
+        return ps
