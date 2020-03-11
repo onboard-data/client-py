@@ -5,22 +5,27 @@ from .exceptions import OnboardApiException
 from .models import PointSelector
 
 
-HEADERS = {
-    'Content-Type': 'application/json',
-    'User-Agent': 'Onboard Py-SDK',
-}
+USER_AGENT = 'Onboard Py-SDK'
 
 
 class APIClient:
-
-    def __init__(self, api_url, user=None, pw=None, api_key=None, token=None):
+    def __init__(self, api_url, user=None, pw=None, api_key=None, token=None,
+                 name=''):
         self._api_url = api_url
         self._user = user
         self._pw = pw
         self._api_key = api_key
         self._token = token
+        self._name = name
         if not (api_key or token or (user and pw)):
             raise OnboardApiException("Need one of: user & pw, token or an api key")
+
+    def headers(self):
+        agent = f"{USER_AGENT} ({self._name})" if self._name else USER_AGENT
+        return {
+            'Content-Type': 'application/json',
+            'User-Agent': agent,
+        }
 
     @json
     def __pw_login(self):
@@ -29,13 +34,13 @@ class APIClient:
             'login': self._user,
             'password': self._pw,
         }
-        return requests.post(url, json=payload, headers=HEADERS)
+        return requests.post(url, json=payload, headers=self.headers())
 
     @json
     def __api_key_login(self):
         url = '{}/login/api-key'.format(self._api_url)
         payload = {'key': self._api_key}
-        return requests.post(url, json=payload, headers=HEADERS)
+        return requests.post(url, json=payload, headers=self.headers())
 
     def _get_token(self):
         if self._token is None:
@@ -52,7 +57,7 @@ class APIClient:
 
     def auth(self):
         token = self._get_token()
-        return {'Authorization': f'Bearer {token}', **HEADERS}
+        return {'Authorization': f'Bearer {token}', **self.headers()}
 
     @json
     def whoami(self):
