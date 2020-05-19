@@ -107,6 +107,19 @@ class APIClient(ClientBase):
         json = ingest_stats.json()
         return self.post('/ingest-stats', json=json)
 
+    @json
+    def copy_point_data(self, point_id_map, start_time, end_time):
+        """Copy data between points
+        point_id_map: a map of source to destination point id
+        start/end: ISO formatted timestamp strings e.g. '2019-11-29T20:16:25Z'
+        """
+        command = {
+            'point_id_map': point_id_map,
+            'start_time': start_time,
+            'end_time': end_time,
+        }
+        return self.post('/point-data-copy', json=command)
+
 
 class DevelopmentAPIClient(APIClient):
     def __init__(self, user=None, pw=None, api_key=None, token=None):
