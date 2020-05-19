@@ -15,8 +15,8 @@ def json(func):
 
             # remove the cached access token if authorization failed
             # it's likely just expired
-            if res.status_code == 401 and args[0]._token is not None:
-                args[0]._token = None
+            if res.status_code == 401 and args[0].token is not None:
+                args[0].token = None
                 return wrapper(*args, **kwargs)
 
             if res.status_code > 499:
