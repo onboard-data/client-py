@@ -1,7 +1,7 @@
 import urllib.parse
 from typing import List, Dict, Any, Optional
 from .util import divide_chunks, json
-from .models import PointSelector
+from .models import PointSelector, PointDataUpdate, IngestStats
 from .helpers import ClientBase
 
 
@@ -38,6 +38,8 @@ class APIClient(ClientBase):
 
     @json
     def get_tags(self) -> List[Dict[str, str]]:
+        """returns a list of all the haystack tags in the system
+        For more info, please see https://project-haystack.org/tag"""
         return self.get('/tags')
 
     @json
@@ -50,9 +52,11 @@ class APIClient(ClientBase):
 
     @json
     def select_points(self, selector: PointSelector) -> Dict[str, List[int]]:
+        """returns point ids based on the provided selector"""
         return self.post('/points/select', json=selector.json())
 
     def get_all_points(self) -> List[int]:
+        """returns all points for all visible buildings"""
         buildings = self.get_all_buildings()
         point_ids = []
         for b in buildings:
@@ -119,7 +123,7 @@ class APIClient(ClientBase):
         return self.post('/query', json=query)
 
     @json
-    def update_point_data(self, updates=[]) -> None:
+    def update_point_data(self, updates: List[PointDataUpdate] = []) -> None:
         """Bulk update point data, returns the number of updated points
         updates: an iterable of models.PointDataUpdate objects"""
         for batch in divide_chunks(updates, 500):
@@ -127,7 +131,7 @@ class APIClient(ClientBase):
             self.post('/points_update', json=json)
 
     @json
-    def send_ingest_stats(self, ingest_stats) -> None:
+    def send_ingest_stats(self, ingest_stats: IngestStats) -> None:
         """Send timing and diagnostic info to the portal
         ingest_stats: an instance of models.IngestStats"""
         json = ingest_stats.json()
@@ -144,7 +148,8 @@ class APIClient(ClientBase):
         return self.get('/alerts')
 
     @json
-    def copy_point_data(self, point_id_map, start_time, end_time) -> str:
+    def copy_point_data(self, point_id_map: Dict[int, int],
+                        start_time: str, end_time: str) -> str:
         """Copy data between points
         point_id_map: a map of source to destination point id
         start/end: ISO formatted timestamp strings e.g. '2019-11-29T20:16:25Z'
