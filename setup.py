@@ -17,6 +17,9 @@ setup(name='onboard.client',
       url='https://github.com/onboard-data/onboard-client-py',
       packages=setuptools.find_packages(),
       install_requires=requirements,
+      package_data={
+        'onboard.client': ['py.typed'],
+      },
       classifiers=[
             'Development Status :: 5 - Production/Stable',
             'Environment :: Console',
