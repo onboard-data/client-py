@@ -12,7 +12,21 @@ class APIClient(ClientBase):
 
     @json
     def whoami(self) -> Dict[str, str]:
+        """returns the current account's information"""
         return self.get('/whoami')
+
+    @json
+    def get_account_actions(self) -> List[Dict[str, str]]:
+        """returns the action audit log by or affecting the current account"""
+        return self.get('/account-actions')
+
+    @json
+    def get_users(self) -> List[Dict[str, str]]:
+        """returns the list of visible user accounts
+          For organization admins this is all users in the organization
+          For non-admin users this is just the current account
+        """
+        return self.get('/users')
 
     @json
     def get_organizations(self) -> List[Dict[str, str]]:
@@ -21,6 +35,14 @@ class APIClient(ClientBase):
     @json
     def get_all_buildings(self) -> List[Dict[str, str]]:
         return self.get('/buildings')
+
+    @json
+    def get_tags(self) -> List[Dict[str, str]]:
+        return self.get('/tags')
+
+    @json
+    def get_equipment_types(self) -> List[Dict[str, str]]:
+        return self.get('/equiptype')
 
     @json
     def get_building_equipment(self, building_id: int) -> List[Dict[str, str]]:
@@ -112,6 +134,16 @@ class APIClient(ClientBase):
         self.post('/ingest-stats', json=json)
 
     @json
+    def get_ingest_stats(self) -> List[Dict[str, str]]:
+        """returns ingest stats for all buildings"""
+        return self.get('/ingest-stats')
+
+    @json
+    def get_alerts(self) -> List[Dict[str, str]]:
+        """returns a list of active alerts for all buildings"""
+        return self.get('/alerts')
+
+    @json
     def copy_point_data(self, point_id_map, start_time, end_time) -> str:
         """Copy data between points
         point_id_map: a map of source to destination point id
@@ -127,7 +159,7 @@ class APIClient(ClientBase):
 
 
 class DevelopmentAPIClient(APIClient):
-    def __init__(self, user=None, pw=None, api_key=None, token=None):
+    def __init__(self, user=None, pw=None, api_key=None, token=None) -> None:
         super().__init__('https://devapi.onboarddata.io',
                          user, pw, api_key, token)
 
