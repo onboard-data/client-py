@@ -55,6 +55,7 @@ class APIClient(ClientBase):
 
     def get_points_by_datasource(self, datasource_hashes):
         datasource_hashes_chunked = list(divide_chunks(datasource_hashes, 125))
+
         @json
         def get_points(url):
             return self.get(url)

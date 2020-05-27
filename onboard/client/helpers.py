@@ -1,5 +1,6 @@
 import requests
 from requests.models import Response
+from typing import Optional
 from .exceptions import OnboardApiException
 from .util import json
 
@@ -8,7 +9,11 @@ USER_AGENT = 'Onboard Py-SDK'
 
 class ClientBase:
     """Base class that implements HTTP methods against the API on top of requests"""
-    def __init__(self, api_url, user, pw, api_key, token, name) -> None:
+    def __init__(self, api_url: Optional[str],
+                 user: Optional[str], pw: Optional[str],
+                 api_key: Optional[str],
+                 token: Optional[str],
+                 name: [Optional[str]]) -> None:
         self.api_url = api_url
         self.api_key = api_key
         self.user = user
@@ -16,7 +21,7 @@ class ClientBase:
         self.token = token
         self.name = name
         if not (api_key or token or (user and pw)):
-            raise OnboardApiException("Need one of: user & pw, token or an api key")
+            raise OnboardApiException("Need one of: user & pw, token or api_key")
         self.session = None
 
     def __session(self):

@@ -1,14 +1,30 @@
+import setuptools
 from distutils.core import setup
 
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
-setup(name='api_sdk',
-      version='0.1',
+with open("README.md", "r") as f:
+    long_description = f.read()
+
+setup(name='onboard.client',
+      version='1.0',
+      author='Nathan Merritt',
+      author_email='nathan.merritt@onboarddata.io',
       description='Onboard API SDK',
-      author='Luke Walsh',
-      author_email='luke.walsh@onboarddata.io',
-      url='https://www.onboarddata.io',
-      packages=['api_sdk'],
+      long_description=long_description,
+      long_description_content_type="text/markdown",
+      url='https://github.com/onboard-data/onboard-client-py',
+      packages=setuptools.find_packages(),
       install_requires=requirements,
+      classifiers=[
+            'Development Status :: 5 - Production/Stable',
+            'Environment :: Console',
+            'Intended Audience :: Developers',
+            'License :: OSI Approved :: Apache Software License',
+            'Programming Language :: Python :: 3 :: Only',
+            'Topic :: Scientific/Engineering :: Information Analysis',
+            'Topic :: Software Development :: Libraries',
+      ],
+      python_requires='>=3.6',
       )
