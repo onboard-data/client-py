@@ -1,5 +1,6 @@
 import urllib.parse
-from typing import List, Dict, Any, Optional
+from datetime import datetime
+from typing import List, Dict, Any, Optional, Tuple
 from .util import divide_chunks, json
 from .models import PointSelector, PointDataUpdate, IngestStats
 from .helpers import ClientBase
@@ -54,6 +55,17 @@ class APIClient(ClientBase):
     def select_points(self, selector: PointSelector) -> Dict[str, List[int]]:
         """returns point ids based on the provided selector"""
         return self.post('/points/select', json=selector.json())
+
+    def check_data_availability(self, selector: PointSelector) -> Tuple[Optional[datetime], Optional[datetime]]:
+        """Returns a tuple of data timestamps (most stale, most recent) for selected points"""
+        @json
+        def get_as_json():
+            return self.post('/points/data-availability', json=selector.json())
+
+        res = get_as_json()
+        oldest = self.ts_to_dt(res['oldest'])
+        newest = self.ts_to_dt(res['newest'])
+        return (oldest, newest)
 
     def get_all_points(self) -> List[int]:
         """returns all points for all visible buildings"""

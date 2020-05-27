@@ -1,4 +1,5 @@
 import requests
+import datetime
 from requests.models import Response
 from typing import Optional
 from .exceptions import OnboardApiException
@@ -85,3 +86,8 @@ class ClientBase:
 
     def post(self, url: str, **kwargs) -> Response:
         return self.__session().post(self.url(url), **kwargs)
+
+    def ts_to_dt(self, ts: Optional[float]) -> datetime.datetime:
+        if ts is None:
+            return None
+        return datetime.datetime.utcfromtimestamp(ts / 1000.0)
