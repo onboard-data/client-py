@@ -1,4 +1,3 @@
-import setuptools
 from distutils.core import setup
 
 with open('requirements.txt') as f:
@@ -15,7 +14,7 @@ setup(name='onboard.client',
       long_description=long_description,
       long_description_content_type="text/markdown",
       url='https://github.com/onboard-data/onboard-client-py',
-      packages=setuptools.find_packages(),
+      packages=['onboard.client'],
       install_requires=requirements,
       package_data={
         'onboard.client': ['py.typed'],
