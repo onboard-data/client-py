@@ -12,6 +12,8 @@ def json(func):
     def wrapper(*args, **kwargs):
         try:
             res = func(*args, **kwargs)
+            if res is None:
+                return None
 
             # remove the cached access token if authorization failed
             # it's likely just expired
