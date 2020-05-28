@@ -1,7 +1,7 @@
 import requests
 import datetime
 from requests.models import Response
-from typing import Optional
+from typing import Optional, Union
 from .exceptions import OnboardApiException
 from .util import json
 
@@ -91,3 +91,10 @@ class ClientBase:
         if ts is None:
             return None
         return datetime.datetime.utcfromtimestamp(ts / 1000.0)
+
+    def dt_to_str(self, dt: Union[str, datetime.datetime]) -> str:
+        if isinstance(dt, str):
+            return dt
+        if dt.tzinfo is None:
+            return dt.isoformat() + "Z"
+        return dt.isoformat()

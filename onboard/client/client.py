@@ -1,6 +1,6 @@
 import urllib.parse
 from datetime import datetime
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional, Tuple, Union
 from .util import divide_chunks, json
 from .models import PointSelector, PointDataUpdate, IngestStats
 from .helpers import ClientBase
@@ -122,15 +122,16 @@ class APIClient(ClientBase):
 
     @json
     def query_point_timeseries(self, point_ids: List[int],
-                               start_time: str, end_time: str) -> List[Dict[str, Any]]:
+                               start_time: Union[str, datetime],
+                               end_time: Union[str, datetime]) -> List[Dict[str, Any]]:
         """Query a timespan for a set of point ids
         point_ids: a list of point ids
         start/end time: ISO formatted timestamp strings e.g. '2019-11-29T20:16:25Z'
         """
         query = {
             'point_ids': point_ids,
-            'start_time': start_time,
-            'end_time': end_time,
+            'start_time': self.dt_to_str(start_time),
+            'end_time': self.dt_to_str(end_time),
         }
         return self.post('/query', json=query)
 
@@ -161,7 +162,8 @@ class APIClient(ClientBase):
 
     @json
     def copy_point_data(self, point_id_map: Dict[int, int],
-                        start_time: str, end_time: str) -> str:
+                        start_time: Union[str, datetime],
+                        end_time: Union[str, datetime]) -> str:
         """Copy data between points
         point_id_map: a map of source to destination point id
         start/end: ISO formatted timestamp strings e.g. '2019-11-29T20:16:25Z'
@@ -169,8 +171,8 @@ class APIClient(ClientBase):
         """
         command = {
             'point_id_map': point_id_map,
-            'start_time': start_time,
-            'end_time': end_time,
+            'start_time': self.dt_to_str(start_time),
+            'end_time': self.dt_to_str(end_time),
         }
         return self.post('/point-data-copy', json=command)
 
