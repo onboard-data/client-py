@@ -1,3 +1,3 @@
--e git+git@bitbucket.org:onboarddata/api_sdk.git#egg=api_sdk
+onboard.client
 numpy
 pandas
