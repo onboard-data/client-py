@@ -1,5 +1,10 @@
 # Onboard Portal Python SDK
 
+![PyPI](https://img.shields.io/pypi/v/onboard.client)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/onboard.client)
+![PyPI - Status](https://img.shields.io/pypi/status/onboard.client)
+![PyPI - License](https://img.shields.io/pypi/l/onboard.client)
+
 This package provides Python bindings to Onboard Data's [building data API](https://portal.onboarddata.io). For more details, you can consult the API's [swagger documentation](https://api.onboarddata.io/doc/).
 
 ## API Access
