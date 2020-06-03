@@ -11,6 +11,8 @@ This package provides Python bindings to Onboard Data's [building data API](http
 
 You'll need an API key or existing account in order to use this client. If you don't have one and would like to start prototyping against an example building please [request a key here](https://www.onboarddata.io/apirequest).
 
+Once you have a key, data access is explicitly granted by attaching one or more 'scopes' to the key. Our endpoints are grouped by scope on the [swagger documentation](https://api.onboarddata.io/doc/) viewer.
+
 ## Client usage example
 
 First, you'll need to install the client (requires Python >= 3.6 )
@@ -19,7 +21,7 @@ First, you'll need to install the client (requires Python >= 3.6 )
 $ pip install onboard.client
 ```
 
-Now you can use the client to fetch timeseries data for sensors by building or based on type.
+Now you can use the client to fetch timeseries data for sensors by building or based on type. This example requires a key with the scopes `auth`, `general` and `buildings:ro`.
 
 ```python
 from onboard.client import OnboardClient
