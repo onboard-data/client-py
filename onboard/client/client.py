@@ -131,7 +131,7 @@ class APIClient(ClientBase):
                                end_time: Union[str, datetime]) -> List[Dict[str, Any]]:
         """Query a timespan for a set of point ids
         point_ids: a list of point ids
-        start/end time: ISO formatted timestamp strings e.g. '2019-11-29T20:16:25Z'
+        start/end time: ISO formatted timestamp strings e.g. '2019-11-29T20:16:25Z' or a datetime
         """
         query = {
             'point_ids': point_ids,
