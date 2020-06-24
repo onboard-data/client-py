@@ -21,7 +21,7 @@ First, you'll need to install the client (requires Python >= 3.6 )
 $ pip install onboard.client
 ```
 
-Now you can use the client to fetch timeseries data for sensors by building or based on type. This example requires a key with the scopes `auth`, `general` and `buildings:ro`.
+Now you can use the client to fetch timeseries data for sensors by building or based on type. This example requires a key with the scopes `auth`, `general` and `buildings:read`.
 
 ```python
 from onboard.client import OnboardClient
