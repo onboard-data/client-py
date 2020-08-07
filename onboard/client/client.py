@@ -52,6 +52,11 @@ class APIClient(ClientBase):
         return self.get(f'/buildings/{building_id}/equipment?points=true')
 
     @json
+    def get_equipment_by_ids(self, equipment_ids: List[int]) -> List[Dict[str, object]]:
+        body = {'equipment_ids': equipment_ids}
+        return self.post('/equipment/query', json=body)
+
+    @json
     def get_building_changelog(self, building_id: int) -> List[Dict[str, object]]:
         """Returns a list of changelog entries for the specified building"""
         return self.get(f'/buildings/{building_id}/changelog')
