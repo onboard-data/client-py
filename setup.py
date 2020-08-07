@@ -7,7 +7,7 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 setup(name='onboard.client',
-      version='1.1.1',
+      version='1.2.0',
       author='Nathan Merritt',
       author_email='nathan.merritt@onboarddata.io',
       description='Onboard API SDK',
