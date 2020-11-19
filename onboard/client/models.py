@@ -1,5 +1,9 @@
 import math
 from datetime import datetime, timezone
+from typing import List, Optional, Union
+from dataclasses import field
+from pydantic.dataclasses import dataclass
+from pydantic import validator
 
 
 class PointDataUpdate(object):
@@ -51,29 +55,35 @@ class IngestStats(object):
         }
 
 
+@dataclass
 class PointSelector:
     """A flexible interface to allow users to select sets of points"""
-    def __init__(self) -> None:
-        self.orgs = []  # id, name or short_name
-        self.buildings = []  # id or name
-        # returned points are the superset of these three selectors
-        self.point_ids = []  # ints
-        self.point_names = []  # strings
-        self.point_hashes = []  # strings
-        self.point_types = []  # PointType.id or PointType.tag_name
-        self.equipment = []  # Equipment.id or Equipment.suffix
-        self.equipment_types = []  # EquipmentType.id or EquipmentType.tag_name
-        self.updated_since = None  # datetime
+    # id, name or short_name
+    orgs: List[Union[int, str]] = field(default_factory=list)
+    # id or name
+    buildings: List[Union[int, str]] = field(default_factory=list)
+
+    # returned points are the superset of these three selectors
+    point_ids: List[int] = field(default_factory=list)
+    point_names: List[str] = field(default_factory=list)
+    point_hashes: List[str] = field(default_factory=list)
+
+    # allow filtering out points w/o recent data
+    updated_since: Optional[datetime] = None
+
+    # PointType.id or PointType.tag_name
+    point_types: List[Union[int, str]] = field(default_factory=list)
+
+    # Equipment.id or Equipment.suffix
+    equipment: List[Union[int, str]] = field(default_factory=list)
+    # EquipmentType.id or EquipmentType.tag_name
+    equipment_types: List[Union[int, str]] = field(default_factory=list)
 
     def json(self):
         ts = self.updated_since.timestamp() * 1000.0 if self.updated_since is not None else None
-        dict = {k: getattr(self, k) for k in vars(self)}
+        dict = {k: getattr(self, k) for k in vars(self)
+                if not k.startswith('__')}
         return {**dict, 'updated_since': ts}
-
-    def __eq__(self, other):
-        if not isinstance(other, PointSelector):
-            return False
-        return self.__dict__ == other.__dict__
 
     @staticmethod
     def from_json(dict):
@@ -86,3 +96,57 @@ class PointSelector:
                     val = datetime.fromtimestamp(val / 1000.0)
             setattr(ps, k, val)
         return ps
+
+
+@dataclass
+class TimeseriesQuery:
+    """Parameters needed to fetch timeseries data.
+
+    Exactly one of point_ids or selector is required
+
+    Note: the server may perform additional validation and reject queries
+    which are constructable by the client
+
+    For example values please refer to
+        https://api.onboarddata.io/doc/#/buildings%3Aread/post_query_v2
+    """
+    start: datetime  # timezone required, year must be >= 2019
+    end: datetime  # timezone required, year must be >= 2019
+    selector: Optional[PointSelector] = None
+    point_ids: List[int] = field(default_factory=list)
+
+    units: List[str] = field(default_factory=list)
+
+    @validator('point_ids')
+    def points_or_selector_required(cls, point_ids, values):
+        has_points = len(point_ids) > 0
+        has_selector = values.get('selector') is not None
+        if has_points == has_selector:
+            raise ValueError("Exactly one of 'point_ids' or 'selector' is required")
+        return point_ids
+
+    @validator('start', 'end')
+    def times_valid(cls, value, values):
+        if value.year < 2019:
+            raise ValueError(f'Time boundaries must be in 2019 or later, saw: {value}')
+        if value.tzinfo is None:
+            raise ValueError(f'Time boundaries require a timezone, saw: {value}')
+        return value
+
+    def json(self):
+        return {
+            'start': self.start.timestamp(),
+            'end': self.end.timestamp(),
+            'selector': self.selector.json() if self.selector is not None else None,
+            'point_ids': self.point_ids,
+            'units': self.units,
+        }
+
+
+@dataclass
+class PointData:
+    point_id: int
+    raw: str
+    unit: str
+    columns: List[str]
+    values: List[List[Union[str, float, int]]]

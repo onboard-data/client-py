@@ -1,8 +1,11 @@
 import urllib.parse
 from datetime import datetime
-from typing import List, Dict, Any, Optional, Tuple, Union
+import deprecation
+from json import loads
+from typing import List, Dict, Any, Optional, Tuple, Union, Iterator
 from .util import divide_chunks, json
-from .models import PointSelector, PointDataUpdate, IngestStats
+from .models import PointSelector, PointDataUpdate, IngestStats, \
+    TimeseriesQuery, PointData
 from .helpers import ClientBase
 
 
@@ -130,6 +133,8 @@ class APIClient(ClientBase):
     def get_all_units(self) -> List[Dict[str, str]]:
         return self.get('/unit')
 
+    @deprecation.deprecated(deprecated_in="1.3.0",
+                            details="Use stream_point_timeseries instead")
     @json
     def query_point_timeseries(self, point_ids: List[int],
                                start_time: Union[str, datetime],
@@ -144,6 +149,25 @@ class APIClient(ClientBase):
             'end_time': self.dt_to_str(end_time),
         }
         return self.post('/query', json=query)
+
+    def stream_point_timeseries(self, query: TimeseriesQuery) -> Iterator[PointData]:
+        """Query a time interval for an explicit set of point ids or
+        with a selector which describes which sensors to include.
+
+        Example values docmentaed on the model tab here:
+            https://api.onboarddata.io/doc/#/buildings%3Aread/post_query_v2
+        """
+
+        @json
+        def query_call():
+            return self.post('/query-v2', json=query.json(), stream=True,
+                             headers={'Accept': 'application/x-ndjson'})
+        query_call.raw_response = True
+
+        with query_call() as res:
+            for line in res.iter_lines():
+                parsed = loads(line)
+                yield PointData(**parsed)
 
     @json
     def update_point_data(self, updates: List[PointDataUpdate] = []) -> None:

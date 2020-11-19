@@ -25,6 +25,9 @@ def json(func):
                 raise OnboardTemporaryException(res.text)
             if res.status_code > 399:
                 raise OnboardApiException(res.text)
+
+            if hasattr(wrapper, 'raw_response'):
+                return res
             return res.json()
         except OnboardApiException as e:
             raise e
