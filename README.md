@@ -32,18 +32,21 @@ client.whoami()  # verify access & connectivity
 client.get_all_point_types()  # retrieve available types of sensors
 
 # retrieve the past 6 hours of data for sensors measuring CO2 ppm
-import datetime
-from onboard.client.models import PointSelector
+from datetime import datetime, timezone, timedelta
+from onboard.client.models import PointSelector, TimeseriesQuery, PointData
+from typing import List
 
 query = PointSelector()
 query.point_types = ['Zone Carbon Dioxide']
 query.buildings = ['Example Building']
 selection = client.select_points(query)
-end = datetime.datetime.utcnow()
-start = end - datetime.timedelta(hours=6)
+end = datetime.utcnow().replace(tzinfo=timezone.utc)
+start = end - timedelta(hours=6)
+
+timeseries_query = TimeseriesQuery(point_ids=selection['points'], start=start, end=end)  # Or `TimeseriesQuery(selector=query, ...)`
 
 sensor_metadata = client.get_points_by_ids(selection['points'])
-sensor_data = client.query_point_timeseries(selection['points'], start, end)
+sensor_data: List[PointData] = list(client.stream_point_timeseries(timeseries_query))
 ```
 
 ## License
