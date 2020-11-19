@@ -15,7 +15,7 @@ Once you have a key, data access is explicitly granted by attaching one or more 
 
 ## Client usage example
 
-First, you'll need to install the client (requires Python >= 3.6 )
+First, you'll need to install the client (requires Python >= 3.7 )
 
 ```bash
 $ pip install onboard.client
