@@ -7,6 +7,7 @@ from .util import divide_chunks, json
 from .models import PointSelector, PointDataUpdate, IngestStats, \
     TimeseriesQuery, PointData
 from .helpers import ClientBase
+from .exceptions import OnboardApiException
 
 
 class APIClient(ClientBase):
@@ -100,7 +101,12 @@ class APIClient(ClientBase):
         for chunk in divide_chunks(point_ids, 500):
             points_str = '[' + ','.join(str(id) for id in chunk) + ']'
             url = f'/points?point_ids={points_str}'
-            points_chunk = get_points(url)
+            try:
+                points_chunk = get_points(url)
+            except OnboardApiException as e:
+                if '"status": 404' in str(e):
+                    continue
+                raise e
             points += points_chunk
         return points
 
@@ -117,7 +123,12 @@ class APIClient(ClientBase):
             hashes_str = "[" + ','.join([r"'" + c + r"'" for c in chunk]) + "]"
             query = urllib.parse.quote(hashes_str)
             url = f'/points?datasource_hashes={query}'
-            points_chunk = get_points(url)
+            try:
+                points_chunk = get_points(url)
+            except OnboardApiException as e:
+                if '"status": 404' in str(e):
+                    continue
+                raise e
             points += points_chunk
         return points
 
