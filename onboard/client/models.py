@@ -149,4 +149,4 @@ class PointData:
     raw: str
     unit: str
     columns: List[str]
-    values: List[List[Union[str, float, int]]]
+    values: List[List[Union[str, float, int, None]]]
