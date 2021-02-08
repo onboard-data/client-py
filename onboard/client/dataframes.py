@@ -1,4 +1,6 @@
 import pandas as pd
+from typing import Iterable
+from onboard.client.models import PointData
 
 
 def points_df_from_timeseries(timeseries, points=[]) -> pd.DataFrame:
@@ -43,3 +45,63 @@ def points_df_from_timeseries(timeseries, points=[]) -> pd.DataFrame:
 
     df = pd.DataFrame(data)
     return df
+
+
+def points_df_from_streaming_timeseries(timeseries: Iterable[PointData],
+                                        points=[],
+                                        point_column_label=None,
+                                        ) -> pd.DataFrame:
+    """Returns a pandas dataframe from the results of a timeseries query"""
+    if point_column_label is None:
+        def point_column_label(p):
+            return p.get('id')
+
+    point_names = {p['id']: point_column_label(p) for p in points}
+    columns = ['timestamp']
+    dates = set()
+    data_by_point = {}
+
+    for point in timeseries:
+        columns.append(point.point_id)
+        ts_index = point.columns.index('time')
+        data_index = point.columns.index(point.unit)
+
+        point_data = {}
+        data_by_point[point.point_id] = point_data
+
+        for val in point.values:
+            ts = val[ts_index]
+            dates.add(ts)
+            clean = val[data_index]
+            point_data[ts] = clean
+
+    dates = list(dates)
+    dates.sort()
+    data = []
+
+    for d in dates:
+        row = {'timestamp': d}
+        for p in columns[1:]:
+            val = data_by_point[p].get(d)
+            point_col = point_names.get(p, p)
+            row[point_col] = val
+        data.append(row)
+
+    df = pd.DataFrame(data)
+    return df
+
+
+def df_time_index(df: pd.DataFrame,
+                  time_col='timestamp', utc=True) -> pd.DataFrame:
+    dt_series = pd.to_datetime(df[time_col], infer_datetime_format=True)
+    datetime_index = pd.DatetimeIndex(dt_series.values)
+    if utc:
+        datetime_index = datetime_index.tz_localize('UTC')
+    df_indexed = df.set_index(datetime_index)
+    df_indexed.drop(time_col, axis=1, inplace=True)
+    return df_indexed
+
+
+def df_objs_to_numeric(df: pd.DataFrame):
+    cols = df.columns[df.dtypes.eq('object')]
+    return df[cols].apply(pd.to_numeric, errors='coerce')
