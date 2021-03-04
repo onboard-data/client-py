@@ -186,14 +186,14 @@ class APIClient(ClientBase):
         updates: an iterable of models.PointDataUpdate objects"""
         for batch in divide_chunks(updates, 500):
             json = [u.json() for u in batch]
-            self.post('/points_update', json=json)
+            self.post('/points_update', json=json).raise_for_status()
 
     @json
     def send_ingest_stats(self, ingest_stats: IngestStats) -> None:
         """Send timing and diagnostic info to the portal
         ingest_stats: an instance of models.IngestStats"""
         json = ingest_stats.json()
-        self.post('/ingest-stats', json=json)
+        self.post('/ingest-stats', json=json).raise_for_status()
 
     @json
     def get_ingest_stats(self) -> List[Dict[str, str]]:
