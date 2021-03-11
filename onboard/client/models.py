@@ -111,8 +111,8 @@ class TimeseriesQuery:
     For example values please refer to
         https://api.onboarddata.io/doc/#/buildings%3Aread/post_query_v2
     """
-    start: datetime  # timezone required, year must be >= 2019
-    end: datetime  # timezone required, year must be >= 2019
+    start: datetime  # timezone required
+    end: datetime  # timezone required
     selector: Optional[PointSelector] = None
     point_ids: List[int] = field(default_factory=list)
 
@@ -128,8 +128,6 @@ class TimeseriesQuery:
 
     @validator('start', 'end')
     def times_valid(cls, value, values):
-        if value.year < 2019:
-            raise ValueError(f'Time boundaries must be in 2019 or later, saw: {value}')
         if value.tzinfo is None:
             raise ValueError(f'Time boundaries require a timezone, saw: {value}')
         return value
