@@ -81,16 +81,25 @@ class APIClient(ClientBase):
         newest = self.ts_to_dt(res['newest'])
         return (oldest, newest)
 
-    def get_all_points(self) -> List[int]:
+    def get_all_points(self) -> List[Dict]:
         """returns all points for all visible buildings"""
         buildings = self.get_all_buildings()
-        point_ids = []
+        points = []
         for b in buildings:
             bldg_id = b['id']
             equipment = self.get_building_equipment(bldg_id)
             for e in equipment:
-                point_ids += e['points']
-        return point_ids
+                points += e['points']
+        return points
+    
+    def get_all_equipment(self) -> List[Dict]:
+        """returns all equipment instances for all visible buildings"""
+        buildings = self.get_all_buildings()
+        equipment = []
+        for b in buildings:
+            bldg_id = b['id']
+            equipment += self.get_building_equipment(bldg_id)
+        return equipment
 
     def get_points_by_ids(self, point_ids: List[int]) -> List[Dict[str, str]]:
         @json
