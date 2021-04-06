@@ -1,0 +1,19 @@
+name: Portal Checks
+on:
+  push:
+    branches: dev
+jobs:
+  tox:
+    runs-on: [self-hosted, linux]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7.x'
+      - name: Install tox
+        run: pip install tox
+      - name: Stylecheck (flake8)
+        run: tox -e flake8
+      - name: Test (pytest)
+        run: tox -e py37

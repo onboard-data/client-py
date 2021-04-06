@@ -34,7 +34,7 @@ class APIClient(ClientBase):
         return self.get('/users')
 
     @json
-    def get_organizations(self) -> List[Dict[str, str]]:
+    def get_organizations(self) -> Dict[str, Dict[str, str]]:
         return self.get('/organizations')
 
     @json
@@ -70,7 +70,9 @@ class APIClient(ClientBase):
         """returns point ids based on the provided selector"""
         return self.post('/points/select', json=selector.json())
 
-    def check_data_availability(self, selector: PointSelector) -> Tuple[Optional[datetime], Optional[datetime]]:
+    def check_data_availability(self,
+                                selector: PointSelector
+                                ) -> Tuple[Optional[datetime], Optional[datetime]]:
         """Returns a tuple of data timestamps (most stale, most recent) for selected points"""
         @json
         def get_as_json():
@@ -91,7 +93,7 @@ class APIClient(ClientBase):
             for e in equipment:
                 points += e['points']
         return points
-    
+
     def get_all_equipment(self) -> List[Dict]:
         """returns all equipment instances for all visible buildings"""
         buildings = self.get_all_buildings()

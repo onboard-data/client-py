@@ -6,7 +6,8 @@ from onboard.client.dataframes import points_df_from_timeseries
 
 def usage():
     print("Usage:")
-    print("python time-series.py <building name or id> <equipment type name + suffix> <start date> <end date>")
+    print("python time-series.py <building name or id> "
+          "<equipment type name + suffix> <start date> <end date>")
     print("e.g. python time-series.py \"Science Park\" \"AHU SSAC-1\" 2019-10-15 2019-10-31")
     sys.exit(1)
 
@@ -21,7 +22,8 @@ def get_building_id(client, building):
     if not matches:
         return None
     if len(matches) > 1:
-        print(f"Found multiple buildings named {building} - ids = {matches} - please retry using an id")
+        print(f"Found multiple buildings named {building} - "
+              f"ids = {matches} - please retry using an id")
         return None
     return matches[0]
 

@@ -1,10 +1,13 @@
 from .exceptions import OnboardApiException, OnboardTemporaryException
+from typing import List, Iterable, TypeVar
+
+T = TypeVar('T')
 
 
-def divide_chunks(l, n):
-    # looping till length l
-    for i in range(0, len(l), n):
-        yield l[i:i + n]
+def divide_chunks(input_list: List[T], n: int) -> Iterable[List[T]]:
+    # looping till length input_list
+    for i in range(0, len(input_list), n):
+        yield input_list[i:i + n]
 
 
 def json(func):
