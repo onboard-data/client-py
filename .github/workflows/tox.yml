@@ -1,4 +1,4 @@
-name: Onboard Client Checks
+name: onboard.client
 on:
   push:
     branches: dev
@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.7', '3.8', '3.9']
-    name: Python ${{ matrix.python-version }} sample
+    name: Python ${{ matrix.python-version }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
