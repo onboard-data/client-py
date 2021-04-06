@@ -5,12 +5,17 @@ on:
 jobs:
   tox:
     runs-on: [self-hosted, linux]
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9']
+    name: Python ${{ matrix.python-version }} sample
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: ['3.7', '3.8', '3.9']
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
       - name: Install tox
         run: pip install tox
       - name: Stylecheck (flake8)
