@@ -21,4 +21,4 @@ jobs:
       - name: Stylecheck (flake8)
         run: tox -e flake8
       - name: Test (pytest)
-        run: tox -e py37
+        run: tox -e py3
