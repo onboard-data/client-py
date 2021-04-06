@@ -3,7 +3,6 @@
 
 # config
 /config.json
-*.ini
 !ansible/configs/*.ini
 
 # ignore ansile retry file
