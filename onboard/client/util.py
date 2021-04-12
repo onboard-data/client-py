@@ -25,9 +25,9 @@ def json(func):
                 return wrapper(*args, **kwargs)
 
             if res.status_code > 499:
-                raise OnboardTemporaryException(res.text)
+                raise OnboardTemporaryException(res.text or res.status_code)
             if res.status_code > 399:
-                raise OnboardApiException(res.text)
+                raise OnboardApiException(res.text or res.status_code)
 
             if hasattr(wrapper, 'raw_response'):
                 return res
