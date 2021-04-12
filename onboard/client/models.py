@@ -58,7 +58,7 @@ class IngestStats(object):
 @dataclass
 class PointSelector:
     """A flexible interface to allow users to select sets of points"""
-    # id, name or short_name
+    # id, name, short_name or name_abbr
     orgs: List[Union[int, str]] = field(default_factory=list)
     # id or name
     buildings: List[Union[int, str]] = field(default_factory=list)
