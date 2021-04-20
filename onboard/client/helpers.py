@@ -10,6 +10,7 @@ USER_AGENT = 'Onboard Py-SDK'
 
 class ClientBase:
     """Base class that implements HTTP methods against the API on top of requests"""
+
     def __init__(self, api_url: Optional[str],
                  user: Optional[str], pw: Optional[str],
                  api_key: Optional[str],
@@ -38,6 +39,8 @@ class ClientBase:
                 'User-Agent': agent}
 
     def auth(self):
+        if self.api_key is not None:
+            return {'X-OB-Api': self.api_key}
         token = self.__get_token()
         return {'Authorization': f'Bearer {token}'}
 
@@ -49,17 +52,9 @@ class ClientBase:
         }
         return self.post('/login', json=payload)
 
-    @json
-    def __api_key_login(self):
-        payload = {'key': self.api_key}
-        return self.post('/login/api-key', json=payload)
-
     def __get_token(self):
         if self.token is None:
-            if self.api_key:
-                login_res = self.__api_key_login()
-            else:
-                login_res = self.__pw_login()
+            login_res = self.__pw_login()
             self.token = login_res['access_token']
 
         if self.token is None:
