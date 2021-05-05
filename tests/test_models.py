@@ -1,3 +1,5 @@
+# type: ignore
+
 from datetime import datetime, timezone
 from onboard.client.models import TimeseriesQuery, PointData
 

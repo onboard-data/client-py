@@ -11,8 +11,11 @@ from .exceptions import OnboardApiException
 
 
 class APIClient(ClientBase):
-    def __init__(self, api_url, user=None, pw=None, api_key=None, token=None,
-                 name='') -> None:
+    def __init__(self, api_url: str,
+                 user: Optional[str] = None, pw: Optional[str] = None,
+                 api_key: Optional[str] = None,
+                 token: Optional[str] = None,
+                 name: str = '') -> None:
         super().__init__(api_url, user, pw, api_key, token, name)
 
     @json
@@ -52,7 +55,7 @@ class APIClient(ClientBase):
         return self.get('/equiptype')
 
     @json
-    def get_building_equipment(self, building_id: int) -> List[Dict[str, str]]:
+    def get_building_equipment(self, building_id: int) -> List[Dict[str, Any]]:
         return self.get(f'/buildings/{building_id}/equipment?points=true')
 
     @json
@@ -83,10 +86,10 @@ class APIClient(ClientBase):
         newest = self.ts_to_dt(res['newest'])
         return (oldest, newest)
 
-    def get_all_points(self) -> List[Dict]:
+    def get_all_points(self) -> List[Dict[str, Any]]:
         """returns all points for all visible buildings"""
         buildings = self.get_all_buildings()
-        points = []
+        points: List[Dict[str, Any]] = []
         for b in buildings:
             bldg_id = b['id']
             equipment = self.get_building_equipment(bldg_id)
@@ -184,7 +187,7 @@ class APIClient(ClientBase):
         def query_call():
             return self.post('/query-v2', json=query.json(), stream=True,
                              headers={'Accept': 'application/x-ndjson'})
-        query_call.raw_response = True
+        query_call.raw_response = True  # type: ignore[attr-defined]
 
         with query_call() as res:
             for line in res.iter_lines():
