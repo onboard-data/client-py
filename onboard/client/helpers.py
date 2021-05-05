@@ -1,7 +1,7 @@
 import requests
 import datetime
 from requests.models import Response
-from typing import Optional, Union
+from typing import Optional, Union, Any
 from .exceptions import OnboardApiException
 from .util import json
 
@@ -11,11 +11,11 @@ USER_AGENT = 'Onboard Py-SDK'
 class ClientBase:
     """Base class that implements HTTP methods against the API on top of requests"""
 
-    def __init__(self, api_url: Optional[str],
+    def __init__(self, api_url: str,
                  user: Optional[str], pw: Optional[str],
                  api_key: Optional[str],
                  token: Optional[str],
-                 name: [Optional[str]]) -> None:
+                 name: Optional[str]) -> None:
         self.api_url = api_url
         self.api_key = api_key
         self.user = user
@@ -24,7 +24,7 @@ class ClientBase:
         self.name = name
         if not (api_key or token or (user and pw)):
             raise OnboardApiException("Need one of: user & pw, token or api_key")
-        self.session = None
+        self.session: Optional[requests.Session] = None
 
     def __session(self):
         if self.session is None:
@@ -70,19 +70,23 @@ class ClientBase:
             return self.api_url + url
         return url
 
-    def get(self, url: str, **kwargs) -> Response:
+    # see comment in util about why we have to lie about types in order to make the
+    # client as readable as possible
+    # same idea here: each of these methods actually returns request.Response
+
+    def get(self, url: str, **kwargs) -> Any:
         return self.__session().get(self.url(url), **kwargs)
 
-    def delete(self, url: str, **kwargs) -> Response:
+    def delete(self, url: str, **kwargs) -> Any:
         return self.__session().delete(self.url(url), **kwargs)
 
-    def put(self, url: str, **kwargs) -> Response:
+    def put(self, url: str, **kwargs) -> Any:
         return self.__session().put(self.url(url), **kwargs)
 
-    def post(self, url: str, **kwargs) -> Response:
+    def post(self, url: str, **kwargs) -> Any:
         return self.__session().post(self.url(url), **kwargs)
 
-    def ts_to_dt(self, ts: Optional[float]) -> datetime.datetime:
+    def ts_to_dt(self, ts: Optional[float]) -> Optional[datetime.datetime]:
         if ts is None:
             return None
         return datetime.datetime.utcfromtimestamp(ts / 1000.0)

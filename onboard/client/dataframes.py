@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Iterable
+from typing import Iterable, Dict, List, Union
 from onboard.client.models import PointData
 
 
@@ -21,7 +21,7 @@ def points_df_from_timeseries(timeseries, points=[]) -> pd.DataFrame:
         ts_index = col_indexes.index('time')
         clean_index = col_indexes.index('clean')
 
-        point_data = {}
+        point_data: Dict[str, float] = {}
         data_by_point[point_id] = point_data
 
         for val in point['values']:
@@ -30,11 +30,11 @@ def points_df_from_timeseries(timeseries, points=[]) -> pd.DataFrame:
             clean = val[clean_index]
             point_data[ts] = clean
 
-    dates = list(dates)
-    dates.sort()
+    sorted_dates = list(dates)
+    sorted_dates.sort()
     data = []
 
-    for d in dates:
+    for d in sorted_dates:
         row = {'timestamp': d}
         for p in columns[1:]:
             val = data_by_point[p].get(d)
@@ -57,7 +57,7 @@ def points_df_from_streaming_timeseries(timeseries: Iterable[PointData],
             return p.get('id')
 
     point_names = {p['id']: point_column_label(p) for p in points}
-    columns = ['timestamp']
+    columns: List[Union[str, int]] = ['timestamp']
     dates = set()
     data_by_point = {}
 
@@ -66,25 +66,25 @@ def points_df_from_streaming_timeseries(timeseries: Iterable[PointData],
         ts_index = point.columns.index('time')
         data_index = point.columns.index(point.unit)
 
-        point_data = {}
+        point_data: Dict[str, Union[str, float, None]] = {}
         data_by_point[point.point_id] = point_data
 
         for val in point.values:
-            ts = val[ts_index]
+            ts: str = val[ts_index]  # type: ignore[assignment]
             dates.add(ts)
             clean = val[data_index]
             point_data[ts] = clean
 
-    dates = list(dates)
-    dates.sort()
+    sorted_dates = list(dates)
+    sorted_dates.sort()
     data = []
 
-    for d in dates:
+    for d in sorted_dates:
         row = {'timestamp': d}
         for p in columns[1:]:
-            val = data_by_point[p].get(d)
+            val = data_by_point[p].get(d)  # type: ignore
             point_col = point_names.get(p, p)
-            row[point_col] = val
+            row[point_col] = val  # type: ignore
         data.append(row)
 
     df = pd.DataFrame(data)
