@@ -1,6 +1,5 @@
 import requests
 import datetime
-from requests.models import Response
 from typing import Optional, Union, Any
 from .exceptions import OnboardApiException
 from .util import json
