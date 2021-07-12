@@ -6,7 +6,7 @@
 ![PyPI - License](https://img.shields.io/pypi/l/onboard.client)
 
 This package provides Python bindings to Onboard Data's [building data API](https://portal.onboarddata.io).
-For more details, you can navigate to the API & Docs to read the Getting Started Documentation section in our Software.
+For more details, you can navigate to the API & Docs Page to read the Getting Started Documentation section in our Software.
 You'll have access to this page once you've signed up for our Sandbox or you've been given access to your organization's account.
 
 ## API Access
