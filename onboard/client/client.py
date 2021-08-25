@@ -189,10 +189,12 @@ class APIClient(ClientBase):
                              headers={'Accept': 'application/x-ndjson'})
         query_call.raw_response = True  # type: ignore[attr-defined]
 
+        point_data = PointData.__pydantic_model__.construct  # type: ignore[attr-defined]
+
         with query_call() as res:
             for line in res.iter_lines():
                 parsed = loads(line)
-                yield PointData(**parsed)
+                yield point_data(**parsed)
 
     @json
     def update_point_data(self, updates: List[PointDataUpdate] = []) -> None:
