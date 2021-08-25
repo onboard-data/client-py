@@ -6,8 +6,8 @@
 ![PyPI - License](https://img.shields.io/pypi/l/onboard.client)
 
 This package provides Python bindings to Onboard Data's [building data API](https://portal.onboarddata.io).
-For more details, you can navigate to the API & Docs Page to read the Getting Started Documentation section in our Software.
-You'll have access to this page once you've signed up for our Sandbox or you've been given access to your organization's account.
+For more details, you can navigate to the API & Docs Page to read the Getting Started Documentation section in the portal.
+You'll have access to this page once you've signed up for our sandbox or you've been given access to your organization's account.
 
 ## API Access
 
@@ -17,17 +17,17 @@ Once you have a key, data access is explicitly granted by attaching one or more 
 
 ## Client usage example
 
-First, you'll need to install the client (requires Python >= 3.7 )
+First, you'll need to install the client (requires Python >= `3.7`)
 
 ```bash
 $ pip install onboard.client
 ```
 
-Now you can use the client to fetch timeseries data for sensors by building or based on type. This example requires a key with the scopes `auth`, `general` and `buildings:read`.
+Now you can use the client to fetch timeseries data for sensors by building or based on type. This example requires an API key with the scopes `general` and `buildings:read`.
 
 ```python
 from onboard.client import OnboardClient
-client = OnboardClient(api_key='your-key-here')
+client = OnboardClient(api_key='ob-p-your-key-here')
 
 client.whoami()  # verify access & connectivity
 
@@ -40,7 +40,7 @@ from typing import List
 
 query = PointSelector()
 query.point_types = ['Zone Carbon Dioxide']
-query.buildings = ['Example Building']
+query.buildings = ['Office Building']  # one of the example buildings available in the sandbox
 selection = client.select_points(query)
 end = datetime.utcnow().replace(tzinfo=timezone.utc)
 start = end - timedelta(hours=6)
