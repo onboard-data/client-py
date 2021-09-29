@@ -85,6 +85,9 @@ class ClientBase:
     def post(self, url: str, **kwargs) -> Any:
         return self.__session().post(self.url(url), **kwargs)
 
+    def patch(self, url: str, **kwargs) -> Any:
+        return self.__session().patch(self.url(url), **kwargs)
+
     def ts_to_dt(self, ts: Optional[float]) -> Optional[datetime.datetime]:
         if ts is None:
             return None

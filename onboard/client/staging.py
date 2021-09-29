@@ -16,7 +16,7 @@ class StagingClient(ClientBase):
     @json
     def update_building_details(self, building_id: int,
                                 details: Dict[str, Any]) -> Dict:
-        return self.post(f"/staging/{building_id}/details", json=details)
+        return self.patch(f"/staging/{building_id}/details", json=details)
 
     @json
     def get_staged_equipment(self, building_id: int) -> Dict:
