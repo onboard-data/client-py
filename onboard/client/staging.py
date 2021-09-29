@@ -22,6 +22,15 @@ class StagingClient(ClientBase):
     def get_staged_equipment(self, building_id: int) -> Dict:
         return self.get(f'/staging/{building_id}')
 
+    def get_staged_equipment_csv(self, building_id: int) -> str:
+        @json
+        def get_csv():
+            return self.get(f'/staging/{building_id}',
+                            headers={'Accept': 'text/csv'})
+
+        get_csv.raw_response = True  # type: ignore[attr-defined]
+        return get_csv().text
+
     @json
     def update_staged_equipment(self, building_id: int, updates: List[Dict]) -> Dict:
         return self.post(f'/staging/{building_id}', json=updates)
