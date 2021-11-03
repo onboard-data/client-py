@@ -1,7 +1,7 @@
 import urllib.parse
 from datetime import datetime
 import deprecation
-from json import loads
+from orjson import loads
 from typing import List, Dict, Any, Optional, Tuple, Union, Iterator
 from .util import divide_chunks, json
 from .models import PointSelector, PointDataUpdate, IngestStats, \
