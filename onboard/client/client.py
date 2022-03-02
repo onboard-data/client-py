@@ -250,3 +250,8 @@ class ProductionAPIClient(APIClient):
                  token: Optional[str] = None) -> None:
         super().__init__('https://api.onboarddata.io',
                          user, pw, api_key, token)
+
+
+class RtemClient(APIClient):
+    def __init__(self, api_key: str) -> None:
+        super().__init__('https://api.ny-rtem.com', api_key=api_key)
