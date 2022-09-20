@@ -8,10 +8,11 @@ from pydantic import validator
 
 class PointDataUpdate(object):
     """Model for bulk-updating a point's data value and timestamp"""
-    __slots__ = ['point_id', 'value', 'last_updated']
+    __slots__ = ['point_id', 'value', 'last_updated', 'first_updated']
 
-    def __init__(self, point_id, value, last_updated):
-        errors = []
+    def __init__(self, point_id: int, value: Union[str, float, int],
+                 last_updated: datetime, first_updated: Optional[datetime] = None) -> None:
+        errors: List[str] = []
         if not isinstance(point_id, int):
             errors.append(f"point id must be an integer, saw {point_id}")
         self.point_id = point_id
@@ -19,14 +20,19 @@ class PointDataUpdate(object):
         if not isinstance(last_updated, datetime):
             errors.append(f"last updated must be a datetime, saw {last_updated}")
         self.last_updated = last_updated
+        if first_updated is not None and not isinstance(first_updated, datetime):
+            errors.append(f"first updated must be a datetime, saw {first_updated}")
+        self.first_updated = first_updated
         if errors:
             raise ValueError(f"Invalid PointDataUpdate: {', '.join(errors)}")
 
     def json(self):
         utc_ts_s = self.last_updated.replace(tzinfo=timezone.utc).timestamp()
-        return {'id': self.point_id,
-                'value': self.value,
-                'last_updated': utc_ts_s * 1000}
+        first_ts = None
+        if self.first_updated is not None:
+            first_ts = 1000 * self.first_updated.replace(tzinfo=timezone.utc).timestamp()
+        return {'id': self.point_id, 'value': self.value,
+                'last_updated': utc_ts_s * 1000, 'first_updated': first_ts}
 
 
 class IngestStats(object):
