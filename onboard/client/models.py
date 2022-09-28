@@ -1,6 +1,6 @@
 import math
 from datetime import datetime, timezone
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Dict
 from dataclasses import field
 from pydantic.dataclasses import dataclass
 from pydantic import validator
@@ -116,13 +116,17 @@ class TimeseriesQuery:
 
     For example values please refer to
         https://api.onboarddata.io/doc/#/buildings%3Aread/post_query_v2
+
+    Unit conversion preferences are expressed as a map from measurement name to unit name, e.g.
+    {'temperature': 'f', 'power': 'kw'}
+
+    See https://portal.onboarddata.io/account?tab=unitPrefs for available measurements and units
     """
     start: datetime  # timezone required
     end: datetime  # timezone required
     selector: Optional[PointSelector] = None
     point_ids: List[int] = field(default_factory=list)
-
-    units: List[str] = field(default_factory=list)
+    units: Dict[str, str] = field(default_factory=dict)  # unit conversion preferences
 
     @validator('point_ids')
     def points_or_selector_required(cls, point_ids, values):
