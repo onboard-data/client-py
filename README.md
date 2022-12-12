@@ -13,7 +13,7 @@ You'll have access to this page once you've signed up for our sandbox or you've 
 
 You'll need an API key or existing account in order to use this client. If you don't have one and would like to start prototyping against an example building please [request a key here](https://onboarddata.io/sandbox).
 
-Once you have a key, data access is explicitly granted by attaching one or more 'scopes' to the key. Our endpoints are grouped by scope on the [swagger documentation](https://api.onboarddata.io/swager/) viewer.
+Once you have a key, data access is explicitly granted by attaching one or more 'scopes' to the key. Our endpoints are grouped by scope on the [swagger documentation](https://api.onboarddata.io/swagger/) viewer.
 
 You can also learn more about this client [on our docs!](https://onboard-api-wrappers-documentation.readthedocs.io/en/latest/index.html)
 
