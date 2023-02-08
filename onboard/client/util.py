@@ -24,7 +24,7 @@ def json(func: Callable[..., T]) -> Callable[..., T]:
 
             # remove the cached access token if authorization failed
             # it's likely just expired
-            if res.status_code == 401 and args[0].token is not None:
+            if res.status_code == 401 and args and args[0].token is not None:
                 args[0].token = None
                 return wrapper(*args, **kwargs)
 
