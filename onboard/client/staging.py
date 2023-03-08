@@ -1,3 +1,4 @@
+from urllib3.util.retry import Retry
 from typing import List, Dict, Any, Optional
 from .helpers import ClientBase
 from .util import json
@@ -9,8 +10,11 @@ class StagingClient(ClientBase):
     def __init__(self, api_url: str,
                  api_key: Optional[str] = None,
                  token: Optional[str] = None,
-                 name: str = '') -> None:
-        super().__init__(api_url, user=None, pw=None, api_key=api_key, token=token, name=name)
+                 name: str = '',
+                 retry: Optional[Retry] = None,
+                 ) -> None:
+        super().__init__(api_url, user=None, pw=None, api_key=api_key, token=token, name=name,
+                         retry=retry)
 
     @json
     def get_staging_building_details(self) -> List[Dict]:

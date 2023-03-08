@@ -1,4 +1,5 @@
 import urllib.parse
+from urllib3.util.retry import Retry
 from datetime import datetime
 import deprecation
 from orjson import loads
@@ -11,12 +12,16 @@ from .exceptions import OnboardApiException
 
 
 class APIClient(ClientBase):
-    def __init__(self, api_url: str,
-                 user: Optional[str] = None, pw: Optional[str] = None,
+    def __init__(self,
+                 api_url: str,
+                 user: Optional[str] = None,
+                 pw: Optional[str] = None,
                  api_key: Optional[str] = None,
                  token: Optional[str] = None,
-                 name: str = '') -> None:
-        super().__init__(api_url, user, pw, api_key, token, name)
+                 name: str = '',
+                 retry: Optional[Retry] = None,
+                 ) -> None:
+        super().__init__(api_url, user, pw, api_key, token, name, retry)
 
     @json
     def whoami(self) -> Dict[str, str]:
@@ -239,19 +244,30 @@ class APIClient(ClientBase):
 
 
 class DevelopmentAPIClient(APIClient):
-    def __init__(self, user=None, pw=None, api_key=None, token=None) -> None:
-        super().__init__('https://devapi.onboarddata.io',
-                         user, pw, api_key, token)
+    def __init__(self,
+                 user: Optional[str] = None,
+                 pw: Optional[str] = None,
+                 api_key: Optional[str] = None,
+                 token: Optional[str] = None,
+                 retry: Optional[Retry] = None,
+                 ) -> None:
+        super().__init__('https://devapi.onboarddata.io', user, pw, api_key, token, retry=retry)
 
 
 class ProductionAPIClient(APIClient):
-    def __init__(self, user: Optional[str] = None, pw: Optional[str] = None,
+    def __init__(self,
+                 user: Optional[str] = None,
+                 pw: Optional[str] = None,
                  api_key: Optional[str] = None,
-                 token: Optional[str] = None) -> None:
-        super().__init__('https://api.onboarddata.io',
-                         user, pw, api_key, token)
+                 token: Optional[str] = None,
+                 retry: Optional[Retry] = None,
+                 ) -> None:
+        super().__init__('https://api.onboarddata.io', user, pw, api_key, token, retry=retry)
 
 
 class RtemClient(APIClient):
-    def __init__(self, api_key: str) -> None:
-        super().__init__('https://api.ny-rtem.com', api_key=api_key)
+    def __init__(self,
+                 api_key: Optional[str] = None,
+                 retry: Optional[Retry] = None,
+                 ) -> None:
+        super().__init__('https://api.ny-rtem.com', api_key, retry=retry)

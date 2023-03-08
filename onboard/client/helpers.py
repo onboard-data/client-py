@@ -1,5 +1,7 @@
-import requests
 import datetime
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from typing import Optional, Union, Any
 from .exceptions import OnboardApiException
 from .util import json
@@ -14,13 +16,16 @@ class ClientBase:
                  user: Optional[str], pw: Optional[str],
                  api_key: Optional[str],
                  token: Optional[str],
-                 name: Optional[str]) -> None:
+                 name: Optional[str],
+                 retry: Optional[Retry],
+                 ) -> None:
         self.api_url = api_url
         self.api_key = api_key
         self.user = user
         self.pw = pw
         self.token = token
         self.name = name
+        self.retry = retry
         if not (api_key or token or (user and pw)):
             raise OnboardApiException("Need one of: user & pw, token or api_key")
         self.session: Optional[requests.Session] = None
@@ -30,6 +35,10 @@ class ClientBase:
             self.session = requests.Session()
             self.session.headers.update(self.headers())
             self.session.headers.update(self.auth())
+        if self.retry:
+            # http adapter is probably superfluous but no harm as a 'just in case'
+            self.session.mount('http://', HTTPAdapter(max_retries=self.retry))
+            self.session.mount('https://', HTTPAdapter(max_retries=self.retry))
         return self.session
 
     def headers(self):

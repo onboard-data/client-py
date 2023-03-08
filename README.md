@@ -53,6 +53,18 @@ sensor_metadata = client.get_points_by_ids(selection['points'])
 sensor_data: List[PointData] = list(client.stream_point_timeseries(timeseries_query))
 ```
 
+### Retries
+The OnboardClient also exposes urllib3.util.retry.Retry to allow configuring retries in the event of a network issue. An example for use would be
+
+```python
+from onboard.client import OnboardClient
+from urlilib3.util.retry import Retry
+
+retry = Retry(total=3, backoff_factor=0.3, status_forcelist=(500, 502, 504))
+client = OnboardClient(api_key='ob-p-your-key-here', retry=retry)
+
+```
+
 ## Staging client usage
 
 We provide an additional client object for users who wish to modify their building equipment and points in the "staging area" before those metadata are promoted to the primary tables. API keys used with the staging client require the `staging` scope, and your account must be authorized to perform `READ` and `UPDATE` operations on the building itself.
@@ -60,6 +72,8 @@ We provide an additional client object for users who wish to modify their buildi
 The staging area provides a scratchpad interface, where arbitrary additional columns can be added to points or equipment by using the prefix `p.` or `e.`. Any un-prefixed, user-added columns will be attached to points. Each update dictionary can modify a point, equipment or both at the same time (which implicitly reparents the point to the equipment). Each update should `p.topic` and/or `e.equip_id` to identify to the system where to apply the write. If a `topic` and `equip_id` are provided together in the same object then the system will associate that point with that equipment.
 
 Updates use `PATCH` semantics, so only provided fields will be written to. Check-and-set concurrency control is available. To use it, include a `.cas` field with a current value to verify before processing the update. Please see the `update` object in the example below for more details.
+
+The staging client supports the same urllib3.util.retry.Retry support that the standard client has.
 
 ```python
 from onboard.client.staging import OnboardStagingClient
