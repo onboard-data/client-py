@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from .helpers import ClientBase
 from .util import json
 
@@ -7,9 +7,10 @@ class StagingClient(ClientBase):
     """Staging area API bindings"""
 
     def __init__(self, api_url: str,
-                 api_key: str, name: str = '') -> None:
-        super().__init__(api_url, api_key=api_key, name=name,
-                         user=None, pw=None, token=None)
+                 api_key: Optional[str] = None,
+                 token: Optional[str] = None,
+                 name: str = '') -> None:
+        super().__init__(api_url, user=None, pw=None, api_key=api_key, token=token, name=name)
 
     @json
     def get_staging_building_details(self) -> List[Dict]:
