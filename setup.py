@@ -8,8 +8,8 @@ with open("README.md", "r") as f:
 
 setup(name='onboard.client',
       version='1.9.1',
-      author='Nathan Merritt',
-      author_email='nathan.merritt@onboarddata.io',
+      author='Nathan Merritt, John Vines',
+      author_email='support@onboarddata.io',
       description='Onboard API SDK',
       long_description=long_description,
       long_description_content_type="text/markdown",
