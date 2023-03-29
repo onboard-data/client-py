@@ -270,4 +270,4 @@ class RtemClient(APIClient):
                  api_key: Optional[str] = None,
                  retry: Optional[Retry] = None,
                  ) -> None:
-        super().__init__('https://api.ny-rtem.com', api_key, retry=retry)
+        super().__init__('https://api.ny-rtem.com', api_key=api_key, retry=retry)
