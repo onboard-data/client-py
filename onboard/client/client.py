@@ -194,7 +194,12 @@ class APIClient(ClientBase):
                              headers={'Accept': 'application/x-ndjson'})
         query_call.raw_response = True  # type: ignore[attr-defined]
 
-        point_data = PointData.__pydantic_model__.construct  # type: ignore[attr-defined]
+        try:
+            # Pydantic v1
+            point_data = PointData.__pydantic_model__.construct  # type: ignore[attr-defined]
+        except AttributeError:
+            # Pydantic v2
+            point_data = PointData.model_construct  # type: ignore[attr-defined]
 
         with query_call() as res:
             for line in res.iter_lines(chunk_size=20 * 1024):

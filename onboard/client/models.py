@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import List, Optional, Union, Dict
 from dataclasses import field
 from pydantic.dataclasses import dataclass
-from pydantic import validator
+from pydantic import validator, BaseModel
 
 
 class PointDataUpdate(object):
@@ -153,7 +153,7 @@ class TimeseriesQuery:
 
 
 @dataclass
-class PointData:
+class PointData(BaseModel):
     point_id: int
     raw: str
     unit: str

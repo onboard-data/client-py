@@ -1,6 +1,8 @@
 # type: ignore
 
 from datetime import datetime, timezone
+from typing import Dict, Any
+
 from onboard.client.models import TimeseriesQuery, PointData
 
 
@@ -13,6 +15,15 @@ def test_timeseries_query():
     TimeseriesQuery(**dict)
 
 
+def construct(dict: Dict[str, Any]) -> PointData:
+    try:
+        # Pydantic v1
+        return PointData.__pydantic_model__.construct(**dict)  # type: ignore[attr-defined]
+    except AttributeError:
+        # Pydantic v2
+        return PointData.model_construct(**dict)  # type: ignore[attr-defined]
+
+
 def test_point_data():
     dict = {
         'point_id': 1,
@@ -23,7 +34,7 @@ def test_point_data():
             ['2020-12-16', 32.0, 0.0],
         ]
     }
-    PointData.__pydantic_model__.construct(**dict)
+    construct(dict)
 
 
 def test_point_data_none_value():
@@ -36,7 +47,7 @@ def test_point_data_none_value():
             ['2020-12-16', None, 0.0],
         ]
     }
-    PointData.__pydantic_model__.construct(**dict)
+    construct(dict)
 
 
 def test_point_data_extra_keys():
@@ -51,6 +62,6 @@ def test_point_data_extra_keys():
         'foo': 'bar',
         'zip': {'zap': 1},
     }
-    constructed = PointData.__pydantic_model__.construct(**dict)
+    constructed = construct(dict)
     assert constructed.foo == 'bar'
     assert constructed.point_id == 1
