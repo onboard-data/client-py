@@ -129,6 +129,7 @@ class APIClient(ClientBase):
             points += points_chunk
         return points
 
+    # Deprecated
     def get_points_by_datasource(self, datasource_hashes: List[str]) \
             -> List[Dict[str, str]]:
         datasource_hashes_chunked = list(divide_chunks(datasource_hashes, 125))
