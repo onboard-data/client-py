@@ -12,16 +12,12 @@ def test_timeseries_query():
         'start': datetime.utcnow().replace(tzinfo=timezone.utc),
         'end': datetime.utcnow().replace(tzinfo=timezone.utc),
     }
-    TimeseriesQuery(**dict)
+    TimeseriesQuery.model_construct(**dict)
 
 
 def construct(dict: Dict[str, Any]) -> PointData:
-    try:
-        # Pydantic v1
-        return PointData.__pydantic_model__.construct(**dict)  # type: ignore[attr-defined]
-    except AttributeError:
-        # Pydantic v2
-        return PointData.model_construct(**dict)  # type: ignore[attr-defined]
+    # Pydantic v2
+    return PointData.model_construct(**dict)  # type: ignore[attr-defined]
 
 
 def test_point_data():

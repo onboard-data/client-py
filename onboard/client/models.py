@@ -1,9 +1,10 @@
 import math
+from dataclasses import field
 from datetime import datetime, timezone
 from typing import List, Optional, Union, Dict
-from dataclasses import field
+
+from pydantic import field_validator, BaseModel, ConfigDict
 from pydantic.dataclasses import dataclass
-from pydantic import validator, BaseModel
 
 
 class PointDataUpdate(object):
@@ -106,7 +107,7 @@ class PointSelector:
 
 
 @dataclass
-class TimeseriesQuery:
+class TimeseriesQuery(BaseModel):
     """Parameters needed to fetch timeseries data.
 
     Exactly one of point_ids or selector is required
@@ -128,7 +129,7 @@ class TimeseriesQuery:
     point_ids: List[int] = field(default_factory=list)
     units: Dict[str, str] = field(default_factory=dict)  # unit conversion preferences
 
-    @validator('point_ids')
+    @field_validator('point_ids')
     def points_or_selector_required(cls, point_ids, values):
         has_points = len(point_ids) > 0
         has_selector = values.get('selector') is not None
@@ -136,7 +137,7 @@ class TimeseriesQuery:
             raise ValueError("Exactly one of 'point_ids' or 'selector' is required")
         return point_ids
 
-    @validator('start', 'end')
+    @field_validator('start', 'end')
     def times_valid(cls, value, values):
         if value.tzinfo is None:
             raise ValueError(f'Time boundaries require a timezone, saw: {value}')
@@ -159,3 +160,4 @@ class PointData(BaseModel):
     unit: str
     columns: List[str]
     values: List[List[Union[str, float, int, None]]]
+    model_config = ConfigDict(extra='allow', )
