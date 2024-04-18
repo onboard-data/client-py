@@ -19,7 +19,7 @@ You can also learn more about this client [on our docs!](https://onboard-api-wra
 
 ## Client usage example
 
-First, you'll need to install the client (requires Python >= `3.7`)
+First, you'll need to install the client (requires Python >= `3.8`)
 
 ```bash
 $ pip install onboard.client
