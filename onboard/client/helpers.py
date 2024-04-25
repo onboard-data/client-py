@@ -1,8 +1,10 @@
 import datetime
+from typing import Optional, Union, Any
+
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from typing import Optional, Union, Any
+
 from .exceptions import OnboardApiException
 from .util import json
 

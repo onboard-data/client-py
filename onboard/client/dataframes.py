@@ -1,5 +1,7 @@
-import pandas as pd
 from typing import Iterable, Dict, List, Union
+
+import pandas as pd
+
 from onboard.client.models import PointData
 
 

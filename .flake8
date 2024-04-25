@@ -1,0 +1,9 @@
+[flake8]
+max-line-length = 99
+exclude =
+  .git,
+  .tox,
+  build,
+  dist,
+  .mypy_cache,
+  .pytest_cache,

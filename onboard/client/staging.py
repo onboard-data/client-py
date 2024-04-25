@@ -1,5 +1,7 @@
-from urllib3.util.retry import Retry
 from typing import List, Dict, Any, Optional
+
+from urllib3.util.retry import Retry
+
 from .helpers import ClientBase
 from .util import json
 
@@ -39,6 +41,7 @@ class StagingClient(ClientBase):
 
     def get_staged_equipment_csv(self, building_id: int) -> str:
         """Fetch staged equipment and points together in tabular form"""
+
         @json
         def get_csv():
             return self.get(f'/staging/{building_id}',

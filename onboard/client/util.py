@@ -1,6 +1,8 @@
-import requests
-from .exceptions import OnboardApiException, OnboardTemporaryException
 from typing import List, Iterable, TypeVar, Callable
+
+import requests
+
+from .exceptions import OnboardApiException, OnboardTemporaryException
 
 T = TypeVar('T')
 
@@ -13,6 +15,7 @@ def divide_chunks(input_list: List[T], n: int) -> Iterable[List[T]]:
 
 def json(func: Callable[..., T]) -> Callable[..., T]:
     """Decorator for making sure requests responses are handled consistently"""
+
     # the type annotations on json are a lie to let us type the methods in client
     # with approximate descriptions of the JSON they return, even though the methods
     # as implemented return requests.Response objects
@@ -40,4 +43,5 @@ def json(func: Callable[..., T]) -> Callable[..., T]:
             raise e
         except Exception as e:
             raise OnboardApiException(e)
+
     return wrapper

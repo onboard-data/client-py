@@ -3,8 +3,7 @@ from dataclasses import field
 from datetime import datetime, timezone
 from typing import List, Optional, Union, Dict
 
-from pydantic import field_validator, BaseModel, ConfigDict
-from pydantic.dataclasses import dataclass
+from pydantic import field_validator, ConfigDict, BaseModel
 
 
 class PointDataUpdate(object):
@@ -62,8 +61,7 @@ class IngestStats(object):
         }
 
 
-@dataclass
-class PointSelector:
+class PointSelector(BaseModel):
     """A flexible interface to allow users to select sets of points"""
     # id, name, short_name or name_abbr
     orgs: List[Union[int, str]] = field(default_factory=list)
@@ -106,7 +104,6 @@ class PointSelector:
         return ps
 
 
-@dataclass
 class TimeseriesQuery(BaseModel):
     """Parameters needed to fetch timeseries data.
 
@@ -132,7 +129,7 @@ class TimeseriesQuery(BaseModel):
     @field_validator('point_ids')
     def points_or_selector_required(cls, point_ids, values):
         has_points = len(point_ids) > 0
-        has_selector = values.get('selector') is not None
+        has_selector = values.data.get('selector') is not None
         if has_points == has_selector:
             raise ValueError("Exactly one of 'point_ids' or 'selector' is required")
         return point_ids
@@ -153,11 +150,11 @@ class TimeseriesQuery(BaseModel):
         }
 
 
-@dataclass
 class PointData(BaseModel):
+    model_config = ConfigDict(extra='allow')
+
     point_id: int
     raw: str
     unit: str
     columns: List[str]
     values: List[List[Union[str, float, int, None]]]
-    model_config = ConfigDict(extra='allow', )

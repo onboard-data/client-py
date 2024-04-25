@@ -1,14 +1,16 @@
 import urllib.parse
-from urllib3.util.retry import Retry
 from datetime import datetime
+from typing import List, Dict, Any, Optional, Tuple, Union, Iterator
+
 import deprecation
 from orjson import loads
-from typing import List, Dict, Any, Optional, Tuple, Union, Iterator
-from .util import divide_chunks, json
+from urllib3.util.retry import Retry
+
+from .exceptions import OnboardApiException
+from .helpers import ClientBase
 from .models import PointSelector, PointDataUpdate, IngestStats, \
     TimeseriesQuery, PointData
-from .helpers import ClientBase
-from .exceptions import OnboardApiException
+from .util import divide_chunks, json
 
 
 class APIClient(ClientBase):
@@ -82,6 +84,7 @@ class APIClient(ClientBase):
                                 selector: PointSelector
                                 ) -> Tuple[Optional[datetime], Optional[datetime]]:
         """Returns a tuple of data timestamps (most stale, most recent) for selected points"""
+
         @json
         def get_as_json():
             return self.post('/points/data-availability', json=selector.json())
@@ -130,8 +133,7 @@ class APIClient(ClientBase):
         return points
 
     # Deprecated
-    def get_points_by_datasource(self, datasource_hashes: List[str]) \
-            -> List[Dict[str, str]]:
+    def get_points_by_datasource(self, datasource_hashes: List[str]) -> List[Dict[str, str]]:
         datasource_hashes_chunked = list(divide_chunks(datasource_hashes, 125))
 
         @json
@@ -193,6 +195,7 @@ class APIClient(ClientBase):
         def query_call():
             return self.post('/query-v2', json=query.json(), stream=True,
                              headers={'Accept': 'application/x-ndjson'})
+
         query_call.raw_response = True  # type: ignore[attr-defined]
 
         try:
