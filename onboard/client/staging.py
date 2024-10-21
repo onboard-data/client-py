@@ -39,6 +39,16 @@ class StagingClient(ClientBase):
         """Fetch staging equipment and point details together as Python objects"""
         return self.get(f'/staging/{building_id}?points=true')
 
+    @json
+    def get_staged_points(self, building_id: int) -> Dict:
+        """Fetch staging points as Python objects"""
+        return self.get(f'/staging/{building_id}/points')
+
+    @json
+    def get_staged_devices(self, building_id: int) -> Dict:
+        """Fetch staging devices as Python objects"""
+        return self.get(f'/staging/{building_id}/devices')
+
     def get_staged_equipment_csv(self, building_id: int) -> str:
         """Fetch staged equipment and points together in tabular form"""
 
