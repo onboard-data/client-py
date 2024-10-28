@@ -132,28 +132,6 @@ class APIClient(ClientBase):
             points += points_chunk
         return points
 
-    # Deprecated
-    def get_points_by_datasource(self, datasource_hashes: List[str]) -> List[Dict[str, str]]:
-        datasource_hashes_chunked = list(divide_chunks(datasource_hashes, 125))
-
-        @json
-        def get_points(url):
-            return self.get(url)
-
-        points = []
-        for chunk in datasource_hashes_chunked:
-            hashes_str = "[" + ','.join([r"'" + c + r"'" for c in chunk]) + "]"
-            query = urllib.parse.quote(hashes_str)
-            url = f'/points?datasource_hashes={query}'
-            try:
-                points_chunk = get_points(url)
-            except OnboardApiException as e:
-                if '"status": 404' in str(e):
-                    continue
-                raise e
-            points += points_chunk
-        return points
-
     @json
     def get_all_point_types(self) -> List[Dict[str, str]]:
         return self.get('/pointtypes')

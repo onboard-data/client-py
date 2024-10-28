@@ -71,7 +71,6 @@ class PointSelector(BaseModel):
     # returned points are the superset of these three selectors
     point_ids: List[int] = field(default_factory=list)
     point_names: List[str] = field(default_factory=list)
-    point_hashes: List[str] = field(default_factory=list)
     point_topics: List[str] = field(default_factory=list)
 
     # allow filtering out points w/o recent data
