@@ -44,7 +44,7 @@ class APIClient(ClientBase):
         return self.get('/users')
 
     @json
-    def get_organizations(self) -> Dict[str, Dict[str, str]]:
+    def get_organizations(self) -> Dict[str, List[Dict[str, str]]]:
         return self.get('/organizations')
 
     @json
