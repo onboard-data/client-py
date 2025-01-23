@@ -79,6 +79,11 @@ class StagingClient(ClientBase):
         promote_req = {'equip_ids': equip_ids, 'topics': topics}
         return self.post(f'/staging/{building_id}/apply', json=promote_req)
 
+    @json
+    def delete_staging_equipment(self, building_id: int, equip_ids: List[str]) -> Dict:
+        """Delete staged equipment, returning object describing deleted equipment"""
+        return self.delete(f'/staging/{building_id}/equipment', json=equip_ids)
+
 
 class OnboardStagingClient(StagingClient):
     def __init__(self, api_key: str) -> None:
