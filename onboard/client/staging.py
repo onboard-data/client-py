@@ -1,5 +1,6 @@
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 
+import deprecation
 from urllib3.util.retry import Retry
 
 from .helpers import ClientBase
@@ -30,25 +31,50 @@ class StagingClient(ClientBase):
         return self.patch(f"/staging/{building_id}/details", json=details)
 
     @json
+    @deprecation.deprecated(deprecated_in="1.14.0", details="Replaced with get_staging_equipment")
     def get_staged_equipment(self, building_id: int) -> Dict:
-        """Fetch staging equipment (point topic strings only) as Python objects"""
+        """Fetch staging equipment as Python objects"""
         return self.get(f'/staging/{building_id}')
 
     @json
+    @deprecation.deprecated(deprecated_in="1.14.0", details="get_staging_points and "
+                                                            "get_staging_equipment can be used and"
+                                                            " results joined together as needed")
     def get_equipment_and_points(self, building_id: int) -> Dict:
         """Fetch staging equipment and point details together as Python objects"""
         return self.get(f'/staging/{building_id}?points=true')
 
     @json
+    @deprecation.deprecated(deprecated_in="1.14.0", details="replaced with get_staging_points")
     def get_staged_points(self, building_id: int) -> Dict:
         """Fetch staging points as Python objects"""
         return self.get(f'/staging/{building_id}/points')
 
     @json
+    @deprecation.deprecated(deprecated_in="1.14.0", details="replaced with get_staging_devices")
     def get_staged_devices(self, building_id: int) -> Dict:
         """Fetch staging devices as Python objects"""
         return self.get(f'/staging/{building_id}/devices')
 
+    @json
+    def get_staging_devices(self, building_id: int) -> List[Dict]:
+        """Fetch staging devices as Python objects"""
+        return self.get(f'/staging/{building_id}/devices')
+
+    @json
+    def get_staging_points(self, building_id: int) -> List[Dict]:
+        """Fetch staging points as Python objects"""
+        return self.get(f'/staging/{building_id}/points')
+
+    @json
+    def get_staging_equipment(self, building_id: int) -> List[Dict]:
+        """Fetch staging equipment as Python objects"""
+        return self.get(f'/staging/{building_id}/equipment')
+
+    @deprecation.deprecated(deprecated_in="1.14.0",
+                            details="CSV paths removed, get_staging_points and "
+                                    "get_staging_equipment can be used and results joined together"
+                                    " as needed")
     def get_staged_equipment_csv(self, building_id: int) -> str:
         """Fetch staged equipment and points together in tabular form"""
 
@@ -61,9 +87,25 @@ class StagingClient(ClientBase):
         return get_csv().text
 
     @json
+    @deprecation.deprecated(deprecated_in="1.14.0", details="Use update_staging_equipment instead")
     def update_staged_equipment(self, building_id: int, updates: List[Dict]) -> Dict:
         """Update staged equipment and points"""
         return self.post(f'/staging/{building_id}', json=updates)
+
+    @json
+    def update_staging_devices(self, building_id: int, updates: List[Dict]) -> Dict:
+        """Update staged equipment and points"""
+        return self.post(f'/staging/{building_id}/devices', json=updates)
+
+    @json
+    def update_staging_points(self, building_id: int, updates: List[Dict]) -> Dict:
+        """Update staged equipment and points"""
+        return self.post(f'/staging/{building_id}/points', json=updates)
+
+    @json
+    def update_staging_equipment(self, building_id: int, updates: List[Dict]) -> Dict:
+        """Update staged equipment and points"""
+        return self.post(f'/staging/{building_id}/equipment', json=updates)
 
     @json
     def validate_staging_building(self, building_id: int) -> Dict:
@@ -77,6 +119,21 @@ class StagingClient(ClientBase):
         If equip_ids or topics lists are non-empty then only promote those objects. Otherwise
         all valid objects are promoted."""
         promote_req = {'equip_ids': equip_ids, 'topics': topics}
+        return self.post(f'/staging/{building_id}/apply', json=promote_req)
+
+    @json
+    def unpromote_from_staging(self,
+                               building_id: int,
+                               equipment_ids: List[int] = [], point_ids: List[int] = [],
+                               equipment_point_pairs: List[Tuple[int, int]] = []) -> Dict:
+        """Unpromote valid equipment, points, and their relationships to the primary tables,
+        returning any errors.
+        If equip_ids or topics lists are non-empty then only promote those objects. Otherwise
+        all valid objects are promoted."""
+        promote_req = {'equipment_ids': equipment_ids, 'point_ids': point_ids,
+                       'point_equipment_relationships': [
+                           {'equipment_id': equipment_id, 'point_id': point_id} for
+                           equipment_id, point_id in equipment_point_pairs]}
         return self.post(f'/staging/{building_id}/apply', json=promote_req)
 
     @json

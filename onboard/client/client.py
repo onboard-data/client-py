@@ -164,7 +164,7 @@ class APIClient(ClientBase):
         """Query a time interval for an explicit set of point ids or
         with a selector which describes which sensors to include.
 
-        Example values docmentaed on the model tab here:
+        Example values documented on the model tab here:
             https://api.onboarddata.io/doc/#/buildings%3Aread/post_query_v2
         """
 
