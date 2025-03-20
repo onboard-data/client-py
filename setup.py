@@ -6,7 +6,7 @@ with open('requirements.txt') as f:
 with open("README.md", "r") as f:
     long_description = f.read()
 
-setup(name='onboard.client',
+setup(name='onboard_client',
       version='1.14.0',
       author='Nathan Merritt, John Vines',
       author_email='support@onboarddata.io',
