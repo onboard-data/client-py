@@ -95,17 +95,17 @@ class StagingClient(ClientBase):
     @json
     def update_staging_devices(self, building_id: int, updates: List[Dict]) -> Dict:
         """Update staged equipment and points"""
-        return self.post(f'/staging/{building_id}/devices', json=updates)
+        return self.patch(f'/staging/{building_id}/devices', json=updates)
 
     @json
     def update_staging_points(self, building_id: int, updates: List[Dict]) -> Dict:
         """Update staged equipment and points"""
-        return self.post(f'/staging/{building_id}/points', json=updates)
+        return self.patch(f'/staging/{building_id}/points', json=updates)
 
     @json
     def update_staging_equipment(self, building_id: int, updates: List[Dict]) -> Dict:
         """Update staged equipment and points"""
-        return self.post(f'/staging/{building_id}/equipment', json=updates)
+        return self.patch(f'/staging/{building_id}/equipment', json=updates)
 
     @json
     def validate_staging_building(self, building_id: int) -> Dict:
@@ -134,7 +134,7 @@ class StagingClient(ClientBase):
                        'point_equipment_relationships': [
                            {'equipment_id': equipment_id, 'point_id': point_id} for
                            equipment_id, point_id in equipment_point_pairs]}
-        return self.post(f'/staging/{building_id}/apply', json=promote_req)
+        return self.delete(f'/staging/{building_id}/apply', json=promote_req)
 
     @json
     def delete_staging_equipment(self, building_id: int, equip_ids: List[str]) -> Dict:
