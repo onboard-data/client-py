@@ -85,27 +85,29 @@ all_building_details = staging.get_staging_building_details()  # a list of build
 
 building_id: int = 0  # yours here
 
-equipment_and_points_csv = staging.get_staged_equipment_csv(building_id)  # easy to load straight into a pandas.DataFrame
+points = staging.get_staging_points(building_id)
+equipment = staging.get_staging_equipment(building_id)
 
-# or as Python objects
-equipment = staging.get_staged_equipment(building_id)
-equipment_and_points = staging.get_equipment_points(building_id)
-
-update = [
-    # keys to identify the equipment and point we are modifying
-    {'e.equip_id':'ahu-1', 'p.topic':'org/building/4242/my-sensor',
-    # an update to a known field: point.name
-    'p.name': 'I am renaming the name field on the point to this string'
-    # an optional check-and-set guard for the name update
-    'p.name.cas' 'this row update will fail unless the point name matches this CAS value',
-    # arbitrary user-defined fields are supported, prefix them to indicate destination
-    'p.your_custom_field': 'keep track of something on the point here',
-    'p.custom_non-string_field': 107.5,
-    'e.custom_equip_field': 'this field will get saved on the equipment, not the point'}
+point_update = [
+    # keys to identify the point we are modifying
+    {
+        'topic':'org/building/4242/my-sensor',
+        # an update of related equipment: equip_names
+        'equip_names': ["equip_name1", "equip_name2"],
+        # an optional check-and-set guard for the equip relation update
+        'modified.cas': '2025-03-13 14:44:24.133067+00:00'
+    }
 ]
-# concurrent write exceptions and other issues are reported here
-# each update dictionary is processed separately so a given update may partially succeed
-row_write_errors = staging.update_staged_equipment(building_id, update)
+equip_update = [
+    # keys to identify the equipment we are modifying
+    {
+        'name':'ahu-1',
+        # an update to rename equipment
+        'new_name': 'ahu-2',
+    }
+]
+modified_point = staging.update_staging_points(building_id, point_update)
+modified_equipment = staging.update_staging_equipment(building_id, equipment_update)
 ```
 
 ## License
