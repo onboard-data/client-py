@@ -249,11 +249,3 @@ class ProductionAPIClient(APIClient):
                  retry: Optional[Retry] = None,
                  ) -> None:
         super().__init__('https://api.onboarddata.io', user, pw, api_key, token, retry=retry)
-
-
-class RtemClient(APIClient):
-    def __init__(self,
-                 api_key: Optional[str] = None,
-                 retry: Optional[Retry] = None,
-                 ) -> None:
-        super().__init__('https://api.ny-rtem.com', api_key=api_key, retry=retry)
