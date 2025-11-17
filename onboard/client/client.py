@@ -160,7 +160,7 @@ class APIClient(ClientBase):
         }
         return self.post('/query', json=query)
 
-    def stream_point_timeseries(self, query: TimeseriesQuery) -> Iterator[PointData]:
+    def stream_point_timeseries(self, query: TimeseriesQuery, resample_mins: Optional[int] = None) -> Iterator[PointData]:
         """Query a time interval for an explicit set of point ids or
         with a selector which describes which sensors to include.
 
@@ -170,7 +170,10 @@ class APIClient(ClientBase):
 
         @json
         def query_call():
-            return self.post('/query-v2', json=query.json(), stream=True,
+            params = {}
+            if resample_mins:
+                params['resample_mins'] = resample_mins
+            return self.post('/query-v2', json=query.json(), stream=True, params=params,
                              headers={'Accept': 'application/x-ndjson'})
 
         query_call.raw_response = True  # type: ignore[attr-defined]

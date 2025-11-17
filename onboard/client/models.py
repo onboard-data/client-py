@@ -124,6 +124,7 @@ class TimeseriesQuery(BaseModel):
     selector: Optional[PointSelector] = None
     point_ids: List[int] = field(default_factory=list)
     units: Dict[str, str] = field(default_factory=dict)  # unit conversion preferences
+    aggregations: Dict[str, str] = field(default_factory=dict)  # unit aggregation preferences
 
     @field_validator('point_ids')
     def points_or_selector_required(cls, point_ids, values):
@@ -146,6 +147,7 @@ class TimeseriesQuery(BaseModel):
             'selector': self.selector.json() if self.selector is not None else None,
             'point_ids': self.point_ids,
             'units': self.units,
+            'aggregations': self.aggregations,
         }
 
 
