@@ -8,10 +8,16 @@ from pydantic import field_validator, ConfigDict, BaseModel
 
 class PointDataUpdate(object):
     """Model for bulk-updating a point's data value and timestamp"""
-    __slots__ = ['point_id', 'value', 'last_updated', 'first_updated']
 
-    def __init__(self, point_id: int, value: Union[str, float, int],
-                 last_updated: datetime, first_updated: Optional[datetime] = None) -> None:
+    __slots__ = ["point_id", "value", "last_updated", "first_updated"]
+
+    def __init__(
+        self,
+        point_id: int,
+        value: Union[str, float, int],
+        last_updated: datetime,
+        first_updated: Optional[datetime] = None,
+    ) -> None:
         errors: List[str] = []
         if not isinstance(point_id, int):
             errors.append(f"point id must be an integer, saw {point_id}")
@@ -30,9 +36,15 @@ class PointDataUpdate(object):
         utc_ts_s = self.last_updated.replace(tzinfo=timezone.utc).timestamp()
         first_ts = None
         if self.first_updated is not None:
-            first_ts = 1000 * self.first_updated.replace(tzinfo=timezone.utc).timestamp()
-        return {'id': self.point_id, 'value': self.value,
-                'last_updated': utc_ts_s * 1000, 'first_updated': first_ts}
+            first_ts = (
+                1000 * self.first_updated.replace(tzinfo=timezone.utc).timestamp()
+            )
+        return {
+            "id": self.point_id,
+            "value": self.value,
+            "last_updated": utc_ts_s * 1000,
+            "first_updated": first_ts,
+        }
 
 
 class IngestStats(object):
@@ -43,7 +55,7 @@ class IngestStats(object):
     def summary(self, info):
         # infos, errors, num_points, sample_points, etc
         for k, v in info.items():
-            if k == 'elapsed':
+            if k == "elapsed":
                 self.elapsed(v)
             else:
                 self._building[k] = v
@@ -52,17 +64,20 @@ class IngestStats(object):
         self._points += points
 
     def elapsed(self, elapsed):
-        self._building['processing_time_ms'] = math.floor(elapsed.total_seconds() * 1000)
+        self._building["processing_time_ms"] = math.floor(
+            elapsed.total_seconds() * 1000
+        )
 
     def json(self):
         return {
-            'building': self._building,
-            'points': self._points,
+            "building": self._building,
+            "points": self._points,
         }
 
 
 class PointSelector(BaseModel):
     """A flexible interface to allow users to select sets of points"""
+
     # id, name, short_name or name_abbr
     orgs: List[Union[int, str]] = field(default_factory=list)
     # id or name
@@ -85,17 +100,20 @@ class PointSelector(BaseModel):
     equipment_types: List[Union[int, str]] = field(default_factory=list)
 
     def json(self):
-        ts = self.updated_since.timestamp() * 1000.0 if self.updated_since is not None else None
-        dict = {k: getattr(self, k) for k in vars(self)
-                if not k.startswith('__')}
-        return {**dict, 'updated_since': ts}
+        ts = (
+            self.updated_since.timestamp() * 1000.0
+            if self.updated_since is not None
+            else None
+        )
+        dict = {k: getattr(self, k) for k in vars(self) if not k.startswith("__")}
+        return {**dict, "updated_since": ts}
 
     @staticmethod
     def from_json(dict):
         ps = PointSelector()
         for k in ps.__dict__.keys():
             val = dict.get(k, [])
-            if k == 'updated_since':
+            if k == "updated_since":
                 val = dict.get(k)
                 if val is not None:
                     val = datetime.fromtimestamp(val / 1000.0)
@@ -119,40 +137,43 @@ class TimeseriesQuery(BaseModel):
 
     See https://portal.onboarddata.io/account?tab=unitPrefs for available measurements and units
     """
+
     start: datetime  # timezone required
     end: datetime  # timezone required
     selector: Optional[PointSelector] = None
     point_ids: List[int] = field(default_factory=list)
     units: Dict[str, str] = field(default_factory=dict)  # unit conversion preferences
-    aggregations: Dict[str, str] = field(default_factory=dict)  # unit aggregation preferences
+    aggregations: Dict[str, str] = field(
+        default_factory=dict
+    )  # unit aggregation preferences
 
-    @field_validator('point_ids')
+    @field_validator("point_ids")
     def points_or_selector_required(cls, point_ids, values):
         has_points = len(point_ids) > 0
-        has_selector = values.data.get('selector') is not None
+        has_selector = values.data.get("selector") is not None
         if has_points == has_selector:
             raise ValueError("Exactly one of 'point_ids' or 'selector' is required")
         return point_ids
 
-    @field_validator('start', 'end')
+    @field_validator("start", "end")
     def times_valid(cls, value, values):
         if value.tzinfo is None:
-            raise ValueError(f'Time boundaries require a timezone, saw: {value}')
+            raise ValueError(f"Time boundaries require a timezone, saw: {value}")
         return value
 
     def json(self):
         return {
-            'start': self.start.timestamp(),
-            'end': self.end.timestamp(),
-            'selector': self.selector.json() if self.selector is not None else None,
-            'point_ids': self.point_ids,
-            'units': self.units,
-            'aggregations': self.aggregations,
+            "start": self.start.timestamp(),
+            "end": self.end.timestamp(),
+            "selector": self.selector.json() if self.selector is not None else None,
+            "point_ids": self.point_ids,
+            "units": self.units,
+            "aggregations": self.aggregations,
         }
 
 
 class PointData(BaseModel):
-    model_config = ConfigDict(extra='allow')
+    model_config = ConfigDict(extra="allow")
 
     point_id: int
     raw: str

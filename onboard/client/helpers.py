@@ -8,19 +8,22 @@ from urllib3.util.retry import Retry
 from .exceptions import OnboardApiException
 from .util import json
 
-USER_AGENT = 'Onboard Py-SDK'
+USER_AGENT = "Onboard Py-SDK"
 
 
 class ClientBase:
     """Base class that implements HTTP methods against the API on top of requests"""
 
-    def __init__(self, api_url: str,
-                 user: Optional[str], pw: Optional[str],
-                 api_key: Optional[str],
-                 token: Optional[str],
-                 name: Optional[str],
-                 retry: Optional[Retry],
-                 ) -> None:
+    def __init__(
+        self,
+        api_url: str,
+        user: Optional[str],
+        pw: Optional[str],
+        api_key: Optional[str],
+        token: Optional[str],
+        name: Optional[str],
+        retry: Optional[Retry],
+    ) -> None:
         self.api_url = api_url
         self.api_key = api_key
         self.user = user
@@ -39,33 +42,32 @@ class ClientBase:
             self.session.headers.update(self.auth())
         if self.retry:
             # http adapter is probably superfluous but no harm as a 'just in case'
-            self.session.mount('http://', HTTPAdapter(max_retries=self.retry))
-            self.session.mount('https://', HTTPAdapter(max_retries=self.retry))
+            self.session.mount("http://", HTTPAdapter(max_retries=self.retry))
+            self.session.mount("https://", HTTPAdapter(max_retries=self.retry))
         return self.session
 
     def headers(self):
         agent = f"{USER_AGENT} ({self.name})" if self.name else USER_AGENT
-        return {'Content-Type': 'application/json',
-                'User-Agent': agent}
+        return {"Content-Type": "application/json", "User-Agent": agent}
 
     def auth(self):
         if self.api_key is not None:
-            return {'X-OB-Api': self.api_key}
+            return {"X-OB-Api": self.api_key}
         token = self.__get_token()
-        return {'Authorization': f'Bearer {token}'}
+        return {"Authorization": f"Bearer {token}"}
 
     @json
     def __pw_login(self):
         payload = {
-            'login': self.user,
-            'password': self.pw,
+            "login": self.user,
+            "password": self.pw,
         }
-        return self.post('/login', json=payload)
+        return self.post("/login", json=payload)
 
     def __get_token(self):
         if self.token is None:
             login_res = self.__pw_login()
-            self.token = login_res['access_token']
+            self.token = login_res["access_token"]
 
         if self.token is None:
             raise OnboardApiException("Not authorized")
@@ -76,7 +78,7 @@ class ClientBase:
         return f"OnboardSdk(url={self.api_url})"
 
     def url(self, url: str) -> str:
-        if not url.startswith('http'):
+        if not url.startswith("http"):
             return self.api_url + url
         return url
 

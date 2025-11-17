@@ -4,13 +4,13 @@ import requests
 
 from .exceptions import OnboardApiException, OnboardTemporaryException
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def divide_chunks(input_list: List[T], n: int) -> Iterable[List[T]]:
     # looping till length input_list
     for i in range(0, len(input_list), n):
-        yield input_list[i:i + n]
+        yield input_list[i: i + n]
 
 
 def json(func: Callable[..., T]) -> Callable[..., T]:
@@ -36,7 +36,7 @@ def json(func: Callable[..., T]) -> Callable[..., T]:
             if res.status_code > 399:
                 raise OnboardApiException(res.text or res.status_code)
 
-            if hasattr(wrapper, 'raw_response'):
+            if hasattr(wrapper, "raw_response"):
                 return res
             return res.json()
         except OnboardApiException as e:

@@ -4,8 +4,8 @@ from .exceptions import OnboardApiException, OnboardTemporaryException
 OnboardClient = ProductionAPIClient
 
 __all__ = [
-    'OnboardClient',
-    'APIClient',
-    'OnboardApiException',
-    'OnboardTemporaryException'
+    "OnboardClient",
+    "APIClient",
+    "OnboardApiException",
+    "OnboardTemporaryException",
 ]
