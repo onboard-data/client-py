@@ -41,7 +41,7 @@ from onboard.client.models import PointSelector, TimeseriesQuery, PointData
 from typing import List
 
 query = PointSelector()
-query.point_types = ['Zone Carbon Dioxide']
+query.point_types = ['zone_air_co2_concentration_sensor']
 query.buildings = ['Office Building']  # one of the example buildings available in the sandbox
 selection = client.select_points(query)
 end = datetime.utcnow().replace(tzinfo=timezone.utc)
@@ -50,7 +50,7 @@ start = end - timedelta(hours=6)
 timeseries_query = TimeseriesQuery(point_ids=selection['points'], start=start, end=end)  # Or `TimeseriesQuery(selector=query, ...)`
 
 sensor_metadata = client.get_points_by_ids(selection['points'])
-sensor_data: List[PointData] = list(client.stream_point_timeseries(timeseries_query))
+sensor_data: List[PointData] = list(client.stream_point_timeseries(timeseries_query, resample_mins=5))
 ```
 
 ### Retries
