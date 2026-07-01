@@ -3,21 +3,51 @@ name: GitHub Actions Version Updater
 # Controls when the action will run.
 on:
   schedule:
-    # Automatically run on every Sunday
-    - cron:  '0 0 * * 0'
+    # Automatically run on first of month
+    - cron:  '0 0 1 * *'
+  workflow_dispatch:
 
+# lifted from https://github.com/azat-io/actions-up
 jobs:
-  build:
+  check-actions:
+    name: Check for GHA updates
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
     steps:
-      - uses: actions/checkout@v6.0.2
-        with:
-          # [Required] Access token with `workflow` scope.
-          token: ${{ secrets.UPDATER_PAT }}
+      - name: Checkout repository
+        uses: actions/checkout@v7
 
-      - name: Run GitHub Actions Version Updater
-        uses: saadmk11/github-actions-version-updater@v0.9.0
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          # [Required] Access token with `workflow` scope.
-          token: ${{ secrets.UPDATER_PAT }}
+          node-version: '20'
+
+      - name: Install actions-up
+        run: npm install -g actions-up
+
+      - name: Run actions-up check
+        id: actions-check
+        env:
+          GITHUB_TOKEN: ${{ secrets.UPDATER_PAT }}
+        run: |
+          set -euo pipefail
+          echo "## GitHub Actions Update Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Run actions-up and capture machine-readable output
+          echo "Running actions-up to check for updates..."
+          actions-up --yes --style preserve
+
+      - name: Create PR if outdated actions found
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.UPDATER_PAT  }}
+          commit-message: 'chore: update GitHub Actions versions'
+          title: 'chore: update GitHub Actions versions'
+          body: |
+            Automated update of GitHub Actions to their latest versions.
+          branch: chore/update-actions
+          delete-branch: true
